@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css?family=Oxygen&display=swap');
+body {
+	margin:0px;
+}
+.page	{
+	width:100%;
+}
+#question {
+	position:fixed;
+	top:0px;
+	left:0px;
+	height:80%;
+	width:100%;
+	text-align:center;
+	background-color:black;
+}
+#choices {
+	position:fixed;
+	top:80%;
+	left:0px;
+	height:20%;
+	width:100%;
+}
+#choices .rect {
+	position:fixed;
+	width:50%;
+	height:10%;
+	text-align:center;
+	font-family:'Oxygen';
+	font-size:36px;
+	font-weight:bold;
+	color:#333;
+	line-height:64px;
+}
+#r1 {
+	top:80%;
+	left:0px;
+	background-color:#FF8;
+}
+#r2 {
+	top:90%;
+	left:0px;
+	background-color:#88F;
+}
+#r3 {
+	top:80%;
+	left:50%;
+	background-color:#8F8;
+}
+#r4 {
+	top:90%;
+	left:50%;
+	background-color:#F88;
+}
+#chrono {
+	position:fixed;
+	top:10px;
+	right:10px;
+	width:80px;
+	height:80px;
+	z-index:10;
+}
+
+
+.users {
+	position:fixed;
+	top:80px;
+	width:100%;
+	left:0px;
+}
+
+.users thead { 
+	display: block;
+}
+
+.users tbody {
+	display: block;
+	overflow-y: auto;
+}
+
+.users tr td {
+	font-size:48px;
+	font-family:'Oxygen';
+	font-weight:bold;
+	text-align:left;
+	padding:20px;
+}
+
+.header {
+	position:fixed;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:80px;
+}
+.header tr td {
+	text-align:center;
+	font-family:'Oxygen';
+	font-size:48px;
+	letter-spacing:2px;
+	background-color:#CCC;
+	padding-top:10px;		
+	padding-bottom:10px;
+}
+
+.footer {
+	position:fixed;
+	bottom:0px;
+	left:0px;
+	width:100%;
+	height:80px;
+}
+
+.footer tr td {
+	text-align:center;
+	font-family:'Oxygen';
+	font-size:48px;
+	background-color:#CCC;
+	padding-top:10px;		
+	padding-bottom:10px;
+}
+
+.footer button {
+	font-size:inherit;
+	font-family:inherit;
+	border-radius:10px;
+	padding-left:200px;
+	padding-right:200px;
+}
+
+.mask {
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+	background-color:#FFFC;
+}
+
+.page {
+	display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="page" id="welcome">
+	<table class="header" width="100%" border="0">
+		<tr><td></td></tr>
+	</table>
+	<table class="users" width="100%" border="0">
+	</table>
+	<table class="footer" width="100%" border="0">	
+		<tr><td > <button>OK</button> </td></tr>
+	</table>
+</div>
+
+<div class="page" id="pageq">
+	<div id="chrono">
+		<canvas width="80" height"80"/>
+	</div>
+	<div id="question">
+	<img id="image" src="" height="100%"/>
+	</div>
+	<div id="choices">
+		<div id="r1" class="rect"><span></span>  <div class="mask"></div></div>
+		<div id="r3" class="rect"><span></span>  <div class="mask"></div></div>
+		<div id="r2" class="rect"><span></span>  <div class="mask"></div></div>
+		<div id="r4" class="rect"><span></span>  <div class="mask"></div></div>
+	</div>
+</div>
+
+<div class="page" id="score">
+	<table class="header" width="100%" border="0">
+		<tr><td>SCORE</td></tr>
+	</table>
+	<table class="users" width="100%" border="0">
+	</table>
+</div>
+
+</body>
+<script src="i18n.js"></script>
+<script>
+var delay = 10; // each question is proposed during 10 seconds
+
+var canvas = document.querySelector("#chrono canvas");
+
+var WebSocket = window.WebSocket || window.MozWebSocket;
+var cn = new WebSocket("ws://"+document.location.host);
+
+var game = "jeu";
+var questions = null;
+var qindex = 0;
+
+var t1 = null;	// start of game
+
+var users = [];
+
+var images = [];		// preloaded images
+
+
+document.querySelector("#welcome .header tr td").innerText = location.href;
+
+document.querySelector("#welcome button").addEventListener("click",
+	function() { show_question(0); });
+
+document.querySelector("#image").addEventListener("load",
+	function() {
+		console.log("IMAGE LOADED");
+		cn.send(JSON.stringify({type:"question"}));
+	});
+
+cn.onopen = function() {
+   cn.send(JSON.stringify({type:"desktop",game:game}));
+    }
+
+cn.onerror = function(err) { }
+
+cn.onmessage = function(event) {
+
+    var msg = JSON.parse(event.data);
+	console.log("MESSAGE "+event.data);
+    switch(msg.type) {
+        case "user" :
+			users.push({name:msg.value,id:msg.id,score:0});
+			display_users("welcome");
+			cn.send(JSON.stringify({type:"status",
+				id:msg.id,
+				line1:i18n(I_WELCOME,msg.value),
+				line2:"",
+				line3:i18n(I_WAIT,1)}));
+            break;
+	
+		case "answer":
+			var user = get_user(msg);			
+			if(!user) break;
+			user.rep = msg.value;
+			if(msg.value==questions[qindex].rep)
+				user.score++;
+			cn.send(JSON.stringify({type:"status",
+				id:msg.id,
+				line1:format_reply(msg.value),
+				line2:i18n(I_THANKS),
+				line3:""}));
+			break;
+
+		case "close":
+			window.close();
+			break;
+        }
+    }
+
+load_game();
+
+// ***************************************************************************
+
+function load_game() {
+	var script = document.createElement("script");
+	script.addEventListener("load",start_game);
+	script.addEventListener("error",failure);
+	script.src = "/"+game+"/script.js";
+	document.body.appendChild(script);
+}
+
+// ***************************************************************************
+
+function start_game() {
+
+	show_page("welcome");
+
+	// preload images
+	for(var i=0;i<questions.length;i++) {
+		var image = new Image();
+		image.src = game+"/"+questions[i].img;
+		images.push(image);
+	}
+}
+
+function failure(err) {
+	alert(err);
+}
+
+
+// ***************************************************************************
+
+function show_question(index) {
+
+	qindex = index;
+	var question = questions[index];
+
+	for(var i=0;i<users.length;i++)
+		users[i].rep = null;
+
+	document.querySelector("#question img").src = game+"/"+question.img;
+	document.querySelector("#r1 span").innerText = question.r1;
+	document.querySelector("#r2 span").innerText = question.r2;
+	document.querySelector("#r3 span").innerText = question.r3;
+	document.querySelector("#r4 span").innerText = question.r4;
+
+	for(var i=1;i<=4;i++)
+		document.querySelector("#r"+i+" .mask").style.display = "none";
+
+	show_page("pageq");
+
+	start_chrono();
+}
+
+
+// ***************************************************************************
+
+function finish_question() {	
+	for(var i=1;i<=4;i++)
+		if(i!=questions[qindex].rep)
+			document.querySelector("#r"+i+" .mask").style.display = "block";
+		
+	setTimeout(show_score,5000);
+}
+
+
+// ***************************************************************************
+
+function show_score() {
+
+	display_users("score");
+	show_page("score");
+
+	for(var i=0;i<users.length;i++) {
+		var user = users[i];
+		var msg = {type:"status",
+			id:user.id,
+			line1:format_reply(user.rep),
+			line2:"Score "+user.score+" / "+questions.length,
+			line3:(qindex+1>=questions.length)?"":"Attente de la question "+(qindex+2)+"..."
+			};
+		cn.send(JSON.stringify(msg));
+	}
+	setTimeout(next_question,5000);
+
+}
+
+
+// ***************************************************************************
+
+function format_reply(rep) {
+	if(rep==null)
+		return i18n(I_NANSWER);
+	else
+		return i18n(I_ANSWER,"<span class='c"+rep+"'>■</span>");
+}
+
+
+// ***************************************************************************
+
+function next_question() {
+	if(qindex+1>=questions.length) return;	
+	show_question(qindex+1);	
+}
+
+
+// ***************************************************************************
+
+function show_page(name) {
+	var pages = document.querySelectorAll(".page");
+	for(var i=0;i<pages.length;i++)
+		pages[i].style.display = "none";
+	var page = document.querySelector(".page#"+name);	
+	if(page) page.style.display = "block";
+}
+
+
+// ***************************************************************************
+
+function start_chrono() {
+	t1 = new Date().getTime();
+	document.querySelector("#chrono").style.display = "block";
+	setTimeout(draw_chrono,0);
+}
+
+
+// ***************************************************************************
+
+function draw_chrono() {
+	var t2 = new Date().getTime();
+	var pct = (t2-t1)/(1000*delay);
+
+	if(pct>1) {
+		document.querySelector("#chrono").style.display = "none";
+		finish_question();
+		return;
+	}
+
+	var size = 80;
+	var ctx = canvas.getContext("2d");
+	var x = size/2;	
+	var y = size/2;
+	var r = size/2;
+	var a = Math.PI*2*pct;
+	ctx.clearRect(0,0,size,size);	
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.arc(x,y,r,a-Math.PI/2,Math.PI*2-Math.PI/2,false);
+	ctx.closePath();
+	ctx.fillStyle = "white";
+	ctx.fill();
+
+	setTimeout(draw_chrono,100);
+}
+
+
+// ***************************************************************************
+
+function get_user(msg) {	
+	for(var i=0;i<users.length;i++)
+		if(users[i].id==msg.id)
+			return users[i];
+	return null;
+}
+
+// ***************************************************************************
+
+function display_users(page) {
+	var w = 400;
+	var h = 60;
+
+	var table = document.querySelector("#"+page+" .users");
+	var s= ""
+	for(var i=0;i<users.length;i++) {
+		s += "<tr>";
+		s += "<td><canvas width='"+w+"' height='"+h+"'></td>";
+		s += "<td>"+users[i].name+"</td>";		
+		s += "</tr>"
+	}
+	table.innerHTML = s;
+
+	var dx = w/questions.length;
+
+	var c = document.querySelectorAll("#"+page+" .users canvas");	
+	for(var i=0;i<users.length;i++) {
+		var ctx = c[i].getContext("2d");
+		ctx.fillStyle = "white";	
+		ctx.fillRect(0,0,w,h);
+
+		ctx.fillStyle = "#DDD";
+		for(var j=0;j<questions.length;j++) {
+			var x = dx*j;
+			ctx.fillRect(dx*j,0,dx-5,h);
+		}
+
+		ctx.fillStyle = "#0C0";
+		for(var j=0;j<users[i].score;j++) {
+			var x = dx*j;
+			ctx.fillRect(dx*j,0,dx-5,h);
+		}
+	}
+
+	if(qindex==questions.length-1) 
+		document.querySelector("#score .header tr td").innerText =
+			i18n(I_FSCORE);
+}
+
+// ***************************************************************************
+
+</script>
+</html>
