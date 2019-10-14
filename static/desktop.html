@@ -193,7 +193,8 @@ var canvas = document.querySelector("#chrono canvas");
 var WebSocket = window.WebSocket || window.MozWebSocket;
 var cn = new WebSocket("ws://"+document.location.host);
 
-var game = "jeu";
+var game = get_game_name();
+
 var questions = null;
 var qindex = 0;
 
@@ -259,6 +260,16 @@ load_game();
 
 // ***************************************************************************
 
+function get_game_name() {
+	var q = location.search.replace("?","").split("&");
+	for(var i=0;i<q.length;i++)
+		if(q[i].split("=")[0]==="game")
+			return q[i].split("=")[1];
+	return "jeu";
+}
+
+// ***************************************************************************
+
 function load_game() {
 	var script = document.createElement("script");
 	script.addEventListener("load",start_game);
@@ -282,7 +293,7 @@ function start_game() {
 }
 
 function failure(err) {
-	alert(err);
+	alert("ERROR LOADING "+game);
 }
 
 
@@ -318,7 +329,7 @@ function finish_question() {
 		if(i!=questions[qindex].rep)
 			document.querySelector("#r"+i+" .mask").style.display = "block";
 		
-	setTimeout(show_score,5000);
+	setTimeout(show_score,4000);
 }
 
 
@@ -339,7 +350,7 @@ function show_score() {
 			};
 		cn.send(JSON.stringify(msg));
 	}
-	setTimeout(next_question,5000);
+	setTimeout(next_question,4000);
 
 }
 
