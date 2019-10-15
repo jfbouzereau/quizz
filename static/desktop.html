@@ -345,8 +345,8 @@ function show_score() {
 		var msg = {type:"status",
 			id:user.id,
 			line1:format_reply(user.rep),
-			line2:"Score "+user.score+" / "+questions.length,
-			line3:(qindex+1>=questions.length)?"":"Attente de la question "+(qindex+2)+"..."
+			line2:i18n(I_USCORE,user.score+" / "+questions.length),
+			line3:(qindex+1>=questions.length)?"":i18n(I_WAIT,qindex+2)
 			};
 		cn.send(JSON.stringify(msg));
 	}
@@ -436,7 +436,12 @@ function get_user(msg) {
 
 function display_users(page) {
 	var w = 400;
-	var h = 60;
+
+	var tr = document.querySelectorAll("#"+page+" .users tr");
+	if(tr.length>1)
+		var h = tr[1].offsetTop - tr[0].offsetTop-5;
+	else
+		var h = 60;
 
 	var table = document.querySelector("#"+page+" .users");
 	var s= ""
