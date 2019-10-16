@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <style>
-@import url('https://fonts.googleapis.com/css?family=Oxygen&display=swap');
+@font-face {
+  font-family: myfont;
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/josefinslab/v10/lW-5wjwOK3Ps5GSJlNNkMalnqg6q.ttf);
+}
+
 body {
 	margin:0px;
 }
@@ -31,11 +37,10 @@ body {
 	width:50%;
 	height:10%;
 	text-align:center;
-	font-family:'Oxygen';
+	font-family:myfont;
 	font-size:36px;
-	font-weight:bold;
 	color:#333;
-	line-height:64px;
+	line-height:78px;
 }
 #r1 {
 	top:80%;
@@ -85,8 +90,7 @@ body {
 
 .users tr td {
 	font-size:48px;
-	font-family:'Oxygen';
-	font-weight:bold;
+	font-family:myfont;
 	text-align:left;
 	padding:20px;
 }
@@ -100,7 +104,7 @@ body {
 }
 .header tr td {
 	text-align:center;
-	font-family:'Oxygen';
+	font-family:myfont;
 	font-size:48px;
 	letter-spacing:2px;
 	background-color:#CCC;
@@ -118,7 +122,7 @@ body {
 
 .footer tr td {
 	text-align:center;
-	font-family:'Oxygen';
+	font-family:myfont;
 	font-size:48px;
 	background-color:#CCC;
 	padding-top:10px;		
@@ -227,6 +231,11 @@ cn.onmessage = function(event) {
     var msg = JSON.parse(event.data);
 	console.log("MESSAGE "+event.data);
     switch(msg.type) {
+		case "mobile":
+			var prompt = i18n(I_TEAM);
+			cn.send(JSON.stringify({type:"welcome",id:msg.id,prompt:prompt}));
+			break;
+
         case "user" :
 			users.push({name:msg.value,id:msg.id,score:0});
 			display_users("welcome");

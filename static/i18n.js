@@ -1,5 +1,5 @@
 var I_WELCOME = "Bienvenue % !";
-var I_TEAM = "Votre équipe :";
+var I_TEAM = "Nom de l'équipe";
 var I_ANSWER = "Vous avez répondu %";
 var I_NANSWER = "Vous n'avez pas répondu";
 var I_USCORE = "Score %";

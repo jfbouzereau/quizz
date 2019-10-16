@@ -57,10 +57,19 @@ wss.on("connection", function(cn) {
 				cnmobiles = [];
 				break;
 
-            case "user":
+			case "mobile":
 				cn.id = ++cnid;
 				cnmobiles.push(cn);
 
+				msg.id = cn.id;
+				forward_desktop(msg);
+				break;
+
+			case "welcome":
+				forward_mobile(msg);
+				break;
+
+            case "user":
 				msg.id = cn.id;
 				forward_desktop(msg);
 				break;

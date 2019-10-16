@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 .button {
@@ -70,15 +71,44 @@
 	margin:auto;
 	font-size:24px;
 }
+
+
+#welcome .content {
+	position:fixed;
+	top:20%;
+	left:10px;
+	right:15px;
+}
+
+#welcome .content .prompt {
+	font-size:28px;
+	font-style:italic;
+}
+
+#welcome .content input {
+	font-size:28px;
+	width:100%;
+}
+
+
 </style>
 </head>
 <body>
+
+<div class="page" id="welcome">
+	<div class="content">
+		<div class="prompt">...</div>
+		<input type="text" id="user" />
+	</div>
+</div>
+
 <div class="page" id="choice">
 	<div class="button" id="r1"></div> 
 	<div class="button" id="r2"></div> 
 	<div class="button" id="r3"></div> 
 	<div class="button" id="r4"></div> 
 </div>
+
 <div class="page" id="status">
 	<div id="one" class="part"><div class="content"></div></div>
 	<div id="two" class="part"><div class="content"></div></div>
@@ -89,14 +119,19 @@
 <script>
 var COLORS = ["#FF8","#88F","#8F8","#F88"];
 
-var user = localStorage.getItem("quizz/user");
-user = window.prompt(i18n(I_TEAM),user?user:"");
-localStorage.setItem("quizz/user",user);
+var input = document.querySelector("input#user");
+input.addEventListener("change",onchange);
 
-var answered = false;
+var user = localStorage.getItem("quizz/user");
 
 var WebSocket = window.WebSocket || window.MozWebSocket;
 var cn = new WebSocket("ws://"+document.location.host);
+cn.onopen = onopen;
+cn.onerror = onerror;
+cn.onmessage = onmessage;
+
+
+var answered = false;
 
 document.querySelector("#choice").addEventListener("mousedown",mousedown);
 document.querySelector("#choice").addEventListener("touchstart",mousedown);
@@ -124,20 +159,31 @@ function mouseup(event) {
 		}
 }
 
-
-
-cn.onopen = function() {
+function onchange() {
+	user = input.value;
+	localStorage.setItem("quizz/user",user);
 	cn.send(JSON.stringify({type:"user",value:user}));
+}
+
+
+function onopen() {
+	cn.send(JSON.stringify({type:"mobile"}));
     }
 
-cn.onerror = function(err) {
+function onerror(err) {
     }
 
-cn.onmessage = function(event) {
+function onmessage(event) {
 
     var msg = JSON.parse(event.data);
 	console.log("MESSAGE "+msg);
 	switch(msg.type) {
+		case "welcome":	
+			document.querySelector("#welcome .prompt").innerText = msg.prompt;
+			input.value = user || "";
+			show_page("welcome");
+			break;
+
 		case "question" :		
 			show_page("choice");
 			answered = false;
