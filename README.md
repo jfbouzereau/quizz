@@ -11,7 +11,7 @@ Between each question, the score of all the players is shown.
 ## INSTALLATION
 
 Run `npm install` from the directory to install the
-dependencies (so far only express is required).
+dependencies (so far only express and ws required).
 
 The file `i18n.js` may be customized and adapted to your language.
 
