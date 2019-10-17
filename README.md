@@ -1,6 +1,6 @@
 ## QUIZZ
 
-Quizz is a [kahoo](https://kahoot.com)-like game.
+Quizz is a [kahoot](https://kahoot.com)-like game.
 
 The organizer shows a series of questions at the screen,
 and the players chose the answer on their smartphone,
