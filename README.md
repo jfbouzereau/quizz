@@ -28,18 +28,12 @@ To create a game named `mygame` for example :
 questions = [
 	{
 	img:"picture1.jpg",
-	r1:"choice1of1",
-	r2:"choice2of1",
-	r3:"choice3of1",
-	r4:"choice4of1",
+	choices:["choice1of1","choice2of1","choice3of1","choice4of1"],
 	rep:2		( *if the actual answer is 2* )
 	},
 	{
 	img:"picture2.jpg",
-	r1:"choice1of2",
-	r2:"choice2of2",
-	r3:"choice3of2",
-	r4:"choice4of2",
+	choices:["choice1of2","choice2of2","choice3of2","choice4of2"],
 	rep:4
 	},
 	...

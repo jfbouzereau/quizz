@@ -1,82 +1,82 @@
 questions = [
 	{
 	img:"trompe.jpg",	
-	r1:"Kangourou",
-	r2:"Oryctérope",
-	r3:"Tamanoir",
-	r4:"Ornithorynque",
+	choices:["Kangourou","Oryctérope","Tamanoir","Ornithorynque"],
 	rep:2	
 	},
 	{
 	img:"sax.jpg",
-	r1:"Hautbois",
-	r2:"Clarinette",
-	r3:"Saxophone",
-	r4:"Trombone",
+	choices:["Hautbois","Clarinette","Saxophone","Trombone"],
 	rep:3
 	},
 	{
 	img:"bel.jpg",	
-	r1:"Allemagne",
-	r2:"Autriche",
-	r3:"Luxembourg",
-	r4:"Belgique",
+	choices:["Allemagne","Autriche","Luxembourg","Belgique"],
 	rep:4
 	},
 	{
 	img:"bol.jpg",
-	r1:"Amanite",
-	r2:"Morille",
-	r3:"Cèpe",
-	r4:"Lépiote",	
+	choices:["Amanite","Morille","Bolet","Lépiote"],
 	rep:3
 	},
 	{
 	img:"rich.jpg",
-	r1:"Napoléon",
-	r2:"Mazarin",
-	r3:"Clémenceau",
-	r4:"Richelieu",
+	choices:["Napoléon","Mazarin","Clémenceau","Richelieu"],
 	rep:4
 	},
 	{
 	img:"audi.jpg",
-	r1:"Audi",
-	r2:"Mercedes",
-	r3:"Volvo",
-	r4:"Toyota",
+	choices:["Audi","Mercedes","Volvo","Toyota"],
 	rep:1
 	},
 	{
 	img:"vie.jpg",
-	r1:"TF1",
-	r2:"France 3",
-	r3:"M6",
-	r4:"Arte",
+	choices:["TF1","France 3","M6","Arte"],
 	rep:2
 	},
 	{
 	img:"dome.jpg",
-	r1:"Panthéon",
-	r2:"Val de Grâce",
-	r3:"Invalides",
-	r4:"Institut",	
+	choices:["Panthéon","Val de Grâce","Invalides","Institut"],
 	rep:3
 	},
 	{
 	img:"hanne.jpg",
-	r1:"Hanneton",
-	r2:"Bousier",
-	r3:"Charançon",
-	r4:"Cétoine",
+	choices:["Hanneton","Bousier","Charançon","Cétoine"],
 	rep:1
 	},
 	{
 	img:"coli.jpg",
-	r1:"Venise",
-	r2:"Rome",
-	r3:"Florence",
-	r4:"Naples",
+	choices:["Venise","Rome","Florence","Naples"],
 	rep:2
+	},
+	{
+	img:"pit.jpg",
+	choices:["Mangue","Pitaya","Grenade","Carambole"],
+	rep:2
+	},	
+	{
+	img:"map.jpg",
+	choices:["Amboise","Vendôme","Saumur","Châtellerault"],
+	rep:3
+	},
+	{
+	img:"chien.jpg",
+	choices:["Beagle","Spitz","Yorkshire","Carlin"],
+	rep:2,
+	},
+	{
+	img:"tom.jpg",	
+	choices:["Ron Weasley","Drago Malefoy","Severus Rogue","Albus Dumbledore"],
+	rep:2
+	},
+	{
+	img:"pays.jpg",
+	choices:["Suisse","Chine","Autriche","Australie"],
+	rep:3
+	},
+	{
+	img:"reste.jpg",	
+	choices:["Mac Mahon","Kleber","Foch","Turenne"],
+	rep:1
 	}
 ];
