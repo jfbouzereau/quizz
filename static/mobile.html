@@ -150,11 +150,11 @@
 </body>
 <script src="i18n.js"></script>
 <script>
+var logged = false;
 var COLORS = ["#FF8","#88F","#8F8","#F88"];
 
 var input = document.querySelector("input#user");
 input.addEventListener("change",onchange);
-
 document.querySelector("#welcome button").addEventListener("click",onchange);
 
 var user = localStorage.getItem("quizz/user");
@@ -166,35 +166,55 @@ cn.onerror = onerror;
 cn.onmessage = onmessage;
 
 
-var answered = false;
+var answer = 0;
 
-document.querySelector("#choice").addEventListener("mousedown",mousedown);
-document.querySelector("#choice").addEventListener("touchstart",mousedown);
-document.querySelector("#choice").addEventListener("mouseup",mouseup);
-document.querySelector("#choice").addEventListener("touchend",mouseup);
+document.querySelector("#choice").addEventListener("mousedown",ondown);
+document.querySelector("#choice").addEventListener("touchstart",ondown);
+document.querySelector("#choice").addEventListener("mousemove",onmove);
+document.querySelector("#choice").addEventListener("touchmove",onmove);
+document.querySelector("#choice").addEventListener("mouseup",onup);
+document.querySelector("#choice").addEventListener("touchend",onup);
 
 
-function mousedown(event) {
-	if(answered) return;
+function ondown(event) {		
+	if(answer) return;
 	var target = event.target;
-	if(target.className!="button") return;
-	target.className += " pressed";
-}
-
-function mouseup(event) {
-	if(answered) return;
-	var target = event.target;
-	if(target.className.indexOf(" pressed")>=0) {
-		target.className = target.className.replace(" pressed","");
-	}
 	var m = target.id.match(/^r([1-4])$/);
 	if(m) {
-		cn.send(JSON.stringify({type:"answer",value:m[1]}));
-		answered = true;
+		answer = m[1];
+		console.log("ANSWER IS >>>"+answer+"<<<");
+		target.classList.add("pressed");
+	}
+}
+
+function onmove(event) {
+	if(!answer) return;
+	var target = event.target;
+	var m = target.id.match(/^r([1-4])$/);
+	if(m) {
+		if(m[1]==answer) 
+			document.querySelector("#r"+answer).classList.add("pressed");
+		else
+			document.querySelector("#r"+answer).classList.remove("pressed");
+	}	
+}
+
+function onup(event) {
+	if(!answer) return;
+	var target = event.target;
+	var m = target.id.match(/^r([1-4])$/);
+	if(m && (m[1]==answer)) {
+			cn.send(JSON.stringify({type:"answer",value:m[1]}));
 		}
+
+	var el = document.querySelector("#r"+answer).classList.remove("pressed");
+
+	answer = 0;
 }
 
 function onchange() {
+	if(logged) return;
+	logged = true;
 	user = input.value;
 	localStorage.setItem("quizz/user",user);
 	cn.send(JSON.stringify({type:"user",value:user}));
@@ -221,7 +241,7 @@ function onmessage(event) {
 
 		case "question" :		
 			show_page("choice");
-			answered = false;
+			answer = 0;
 			break;
 
 		case "status":
