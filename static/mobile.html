@@ -10,7 +10,10 @@
   font-weight: 400;
   src: url(https://fonts.gstatic.com/s/josefinslab/v10/lW-5wjwOK3Ps5GSJlNNkMalnqg6q.ttf);
 }
-
+body {
+	margin:0px;
+	overscroll-behavior:none;
+}
 .button {
 	position:fixed;
 	width:50%;
@@ -182,7 +185,6 @@ function ondown(event) {
 	var m = target.id.match(/^r([1-4])$/);
 	if(m) {
 		answer = m[1];
-		console.log("ANSWER IS >>>"+answer+"<<<");
 		target.classList.add("pressed");
 	}
 }
@@ -204,12 +206,11 @@ function onup(event) {
 	var target = event.target;
 	var m = target.id.match(/^r([1-4])$/);
 	if(m && (m[1]==answer)) {
-			cn.send(JSON.stringify({type:"answer",value:m[1]}));
+			answer += 100;
+			send({type:"answer",value:m[1]});
 		}
 
-	var el = document.querySelector("#r"+answer).classList.remove("pressed");
-
-	answer = 0;
+	document.querySelector("#r"+answer).classList.remove("pressed");
 }
 
 function onchange() {
@@ -217,12 +218,12 @@ function onchange() {
 	logged = true;
 	user = input.value;
 	localStorage.setItem("quizz/user",user);
-	cn.send(JSON.stringify({type:"user",value:user}));
+	send({type:"user",value:user});
 }
 
 
 function onopen() {
-	cn.send(JSON.stringify({type:"mobile"}));
+	send({type:"mobile"});
     }
 
 function onerror(err) {
@@ -240,6 +241,7 @@ function onmessage(event) {
 			break;
 
 		case "question" :		
+			clear();
 			show_page("choice");
 			answer = 0;
 			break;
@@ -253,6 +255,12 @@ function onmessage(event) {
 			break;
         }
     }
+
+function clear() {
+	var els = document.querySelectorAll(".pressed");
+	for(var i=0;i<els.length;i++)
+		els[i].classList.remove("pressed");
+}
 
 function show_page(name) {
 	var pages = document.querySelectorAll(".page");
@@ -269,5 +277,8 @@ function show_status(line1,line2,line3) {
 	show_page("status");
 }
 
+function send(msg) {
+	cn.send(JSON.stringify(msg));
+}
 </script>
 </html>

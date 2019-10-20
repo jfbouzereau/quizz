@@ -264,11 +264,11 @@
 	document.querySelector("#image").addEventListener("load",
 		function () {
 			console.log("IMAGE LOADED");
-			cn.send(JSON.stringify({ type: "question" }));
+			send({ type: "question" });
 		});
 
 	cn.onopen = function () {
-		cn.send(JSON.stringify({ type: "desktop", game: game }));
+		send({ type: "desktop", game: game });
 	}
 
 	cn.onerror = function (err) { }
@@ -281,20 +281,20 @@
 			case "mobile":
 				if(qindex>=0) break;
 				var prompt = i18n(I_TEAM);
-				cn.send(JSON.stringify({ type: "welcome", id: msg.id, prompt: prompt }));
+				send({ type: "welcome", id: msg.id, prompt: prompt });
 				break;
 
 			case "user":
 				if(qindex>=0) break;
 				users.push({ name: msg.value, id: msg.id, score: 0 });
 				display_users("welcome");
-				cn.send(JSON.stringify({
+				send({
 					type: "status",
 					id: msg.id,
 					line1: i18n(I_WELCOME, msg.value),
 					line2: "",
 					line3: i18n(I_WAIT, 1)
-				}));
+				});
 				break;
 
 			case "answer":
@@ -304,13 +304,13 @@
 				user.rep = msg.value;
 				if (msg.value == questions[qindex].rep)
 					user.score++;
-				cn.send(JSON.stringify({
+				send({
 					type: "status",
 					id: msg.id,
 					line1: format_reply(msg.value),
 					line2: i18n(I_THANKS),
 					line3: ""
-				}));
+				});
 				break;
 
 			case "close":
@@ -497,7 +497,7 @@
 				line2: i18n(I_USCORE, user.score + " / " + questions.length),
 				line3: (qindex + 1 >= questions.length) ? "" : i18n(I_WAIT, qindex + 2)
 			};
-			cn.send(JSON.stringify(msg));
+			send(msg);
 		}
 		setTimeout(next_question, 4000);
 
@@ -627,6 +627,12 @@
 			document.querySelector("#score .header tr td").innerText =
 				i18n(I_FSCORE);
 	}
+
+// ***************************************************************************
+
+function send(msg){
+	cn.send(JSON.stringify(msg));
+}
 
 // ***************************************************************************
 
