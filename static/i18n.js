@@ -1,3 +1,4 @@
+var I_GAMES = "Questionnaires";
 var I_WELCOME = "Bienvenue % !";
 var I_TEAM = "Nom de l'équipe";
 var I_ANSWER = "Vous avez répondu %";
