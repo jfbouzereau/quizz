@@ -13,6 +13,7 @@
 
 		body {
 			margin: 0px;
+			transition: opacity 0.5s;
 		}
 
 		.page {
@@ -129,6 +130,10 @@
 			text-align: center;
 			padding:20px;
 			cursor:pointer;
+		}
+
+		.games tr td:hover {
+			background-color:#DDD;
 		}
 
 		.header {
@@ -561,11 +566,23 @@
 	// ***************************************************************************
 
 	function show_page(name) {
-		var pages = document.querySelectorAll(".page");
-		for (var i = 0; i < pages.length; i++)
-			pages[i].style.display = "none";
-		var page = document.querySelector(".page#" + name);
-		if (page) page.style.display = "block";
+		document.body.style.opacity = 0;
+		
+		setTimeout(f1,500);
+		setTimeout(f2,1000);
+
+		function  f1() {
+			var pages = document.querySelectorAll(".page");
+			for (var i = 0; i < pages.length; i++)
+				pages[i].style.display = "none";
+			var page = document.querySelector(".page#" + name);
+			if (page) page.style.display = "block";
+		}
+
+		function f2() {
+			document.body.style.opacity = 1;
+		}	
+		
 	}
 
 
@@ -602,7 +619,7 @@
 		ctx.moveTo(x, y);
 		ctx.arc(x, y, r, a - Math.PI / 2, Math.PI * 2 - Math.PI / 2, false);
 		ctx.closePath();
-		ctx.fillStyle = "white";
+		ctx.fillStyle = "#888";
 		ctx.fill();
 
 		setTimeout(draw_chrono, 100);
