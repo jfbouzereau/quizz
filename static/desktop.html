@@ -284,14 +284,11 @@
 	document.querySelector("#welcome button").addEventListener("click",
 		show_games);
 
+	document.querySelector("#games table.games").addEventListener("click",
+		select_game);
+
+
 	show_page("welcome");
-
-
-	document.querySelector("#image").addEventListener("load",
-		function () {
-			console.log("IMAGE LOADED");
-			send({ type: "question" });
-		});
 
 
 	cn.onopen = function () {
@@ -361,21 +358,23 @@
 		table.innerHTML = s;
 		show_page("games");
 
-		table.addEventListener("click",f1);
 
-		function f1(event) {
-			var target = event.target;
-			if(target.tagName!="TD") return;
-			game = target.innerText;	
-			questions = games[game];
-			start_game();
-		}
+	}
 
+	// ***************************************************************************
+	function select_game(event) {
+		var target = event.target;
+		if(target.tagName!="TD") return;
+		game = target.innerText;	
+		questions = games[game];
+		start_game();
 	}
 
 	// ***************************************************************************
 
 	function start_game() {
+
+		qindex = -1;
 
 		for(var i=0;i<users.length;i++)
 			users[i].score = 0;
@@ -462,6 +461,8 @@
 		document.querySelector("#r4").classList.add("zero");
 	
 		show_page("pageq");
+
+		send({ type: "question" });
 
 		setTimeout(f1,  500);
 		setTimeout(f2, 1000);
@@ -550,8 +551,10 @@
 	// ***************************************************************************
 
 	function next_question() {
-		if (qindex + 1 >= questions.length) return;
-		show_question(qindex + 1);
+		if (qindex + 1 >= questions.length)  
+			setTimeout(show_games,10000);
+		else
+			show_question(qindex + 1);
 	}
 
 
@@ -568,7 +571,7 @@
 
 	// ***************************************************************************
 
-	function start_chrono() {
+	function start_chrono() {	
 		t1 = new Date().getTime();
 		document.querySelector("#chrono").style.display = "block";
 		setTimeout(draw_chrono, 0);
@@ -578,6 +581,7 @@
 	// ***************************************************************************
 
 	function draw_chrono() {
+		
 		var t2 = new Date().getTime();
 		var pct = (t2 - t1) / (1000 * delay);
 
@@ -661,6 +665,9 @@
 		if (qindex == questions.length - 1)
 			document.querySelector("#score .header tr td").innerText =
 				i18n(I_FSCORE);
+		else
+			document.querySelector("#score .header tr td").innerText =
+				i18n(I_SCORE);
 	}
 
 // ***************************************************************************
