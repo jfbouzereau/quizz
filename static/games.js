@@ -1,10 +1,42 @@
 var games = 
 {
-	demo:[
+	short:[
 		{
 		img:"trompe.jpg",	
 		choices:["Kangourou","Oryctérope","Tamanoir","Ornithorynque"],
 		answer:2	
+		},
+		{
+		img:"sax.jpg",
+		choices:["Hautbois","Clarinette","Saxophone","Trombone"],
+		answer:3
+		}
+	],
+	demo:[
+		{
+		img:"gone.jpg",
+		choices:["Pentagone","Hexagone","Heptagone","Octogone"],
+		answer:2
+		},
+		{
+		img:"oiseau.jpg",
+		choices:["Mésange","Canari","Rossignol","Merle"],
+		answer:1
+		},
+		{
+		img:"trompe.jpg",	
+		choices:["Kangourou","Oryctérope","Tamanoir","Ornithorynque"],
+		answer:2	
+		},
+		{
+		img:"feuilles.jpg",
+		choices:["Hêtre","Chêne","Frêne","Châtaignier"],
+		answer:1
+		},
+		{
+		img:"coq.jpg",
+		choices:["Praire","Moule","Coque","Palourde"],
+		answer:3
 		},
 		{
 		img:"sax.jpg",

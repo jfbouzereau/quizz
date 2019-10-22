@@ -13,7 +13,7 @@
 
 		body {
 			margin: 0px;
-			transition: opacity 0.5s;
+			transition: opacity 0.1s;
 		}
 
 		.page {
@@ -568,8 +568,8 @@
 	function show_page(name) {
 		document.body.style.opacity = 0;
 		
-		setTimeout(f1,500);
-		setTimeout(f2,1000);
+		setTimeout(f1,100);
+		setTimeout(f2,200);
 
 		function  f1() {
 			var pages = document.querySelectorAll(".page");
