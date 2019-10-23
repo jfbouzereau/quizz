@@ -3,7 +3,7 @@
 Quizz is a [kahoot](https://kahoot.com)-like game.
 
 The organizer shows a series of questions at the screen,
-and the players chose the answer on their smartphone,
+and the players choose the answer on their smartphone,
 amongst four possibilities.
 
 Between each question, the score of all the players is shown.
@@ -11,7 +11,7 @@ Between each question, the score of all the players is shown.
 ## INSTALLATION
 
 Run `npm install` from the directory to install the
-dependencies (so far only express and ws required).
+dependencies (so far only express and ws are required).
 
 The file `i18n.js` may be customized and adapted to your language.
 
@@ -21,7 +21,7 @@ in `server.js` .
 ## GAME PREPARATION
 
 Currently, the archive comes with a short game named `demo`
-with 16 questions in french.
+with 20 questions in french.
 
 To create a game named `mygame` for example :
 * create a subdirectory `mygame` in the directory `static`
@@ -69,7 +69,10 @@ http://myaddress:8000
 
 * wait for each player to be connected
 
-* click `OK` et voila !
+* click OK
+
+* choose the game to be played in the menu
+
 
 
 	
