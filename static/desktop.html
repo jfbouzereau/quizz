@@ -53,10 +53,18 @@
 			font-size: 36px;
 			color: #333;
 			line-height: 78px;
+		}
+
+		#choices .rect span {
+			font-size:5vw;
+			position:absolute;
+			left:50%;
+			top:50%;
+			transform: translate(-50%,-50%);
 			transition: font-size 0.5s;
 		}
 
-		#choices .rect.zero {
+		#choices .rect.zero span {
 			font-size:1px;
 		}
 
@@ -111,7 +119,7 @@
 		}
 
 		.users tr td {
-			font-size: 48px;
+			font-size: 5vw;
 			font-family: myfont;
 			text-align: left;
 			padding: 20px;
@@ -121,7 +129,7 @@
 			position:fixed;
 			top:80px;
 			width:100%;
-			lefgt:0px;
+			left:0px;
 		}
 
 		.games tr td {
@@ -150,7 +158,7 @@
 		.header tr td {
 			text-align: center;
 			font-family: myfont;
-			font-size: 48px;
+			font-size: 5vw;
 			letter-spacing: 2px;
 			padding-top: 10px;
 			padding-bottom: 10px;
@@ -175,13 +183,15 @@
 		}
 
 		.footer button {
-			font-size: inherit;
+			font-size: 5vw;
 			font-family: inherit;
 			border-radius: 10px;
-			padding-left: 200px;
-			padding-right: 200px;
+			padding-left: 25vw;
+			padding-right: 25vw;
 			background-color: inherit;
 			color: white;
+			padding-top:8px;
+			padding-bottom:8px;
 		}
 
 		.mask {
@@ -638,7 +648,7 @@
 	// ***************************************************************************
 
 	function display_users(page) {
-		var w = 400;
+		var w = window.innerWidth/2;
 
 		var tr = document.querySelectorAll("#" + page + " .users tr");
 		if (tr.length > 1)
