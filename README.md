@@ -6,6 +6,12 @@ The organizer shows a series of questions at the screen,
 and the players choose the answer on their smartphone,
 amongst four possibilities.
 
+![question1](question1.png)  
+
+
+
+![question2](question2.png)
+
 Between each question, the score of all the players is shown.
 
 ## INSTALLATION
