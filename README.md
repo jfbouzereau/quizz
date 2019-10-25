@@ -16,13 +16,17 @@ Between each question, the score of all the players is shown.
 
 ## INSTALLATION
 
-Run `npm install` from the directory to install the
+Run `npm install` from the directory to install the 
 dependencies (so far only express and ws are required).
 
-The file `i18n.js` may be customized and adapted to your language.
-
-By default the server listens to port 8000. It can be changed 
+By default the server listens to port 8000. This can be changed 
 in `server.js` .
+
+The questions are proposed during 10 seconds. This can be changed
+in `static/desktop.html` .
+
+The interface is currently in french. The file `static/i18n.js`
+can be customized and adapted to your language.
 
 ## GAME PREPARATION
 
