@@ -1,17 +1,5 @@
 var games = 
 {
-	short:[
-		{
-		img:"trompe.jpg",	
-		choices:["Kangourou","Oryctérope","Tamanoir","Ornithorynque"],
-		answer:2	
-		},
-		{
-		img:"sax.jpg",
-		choices:["Hautbois","Clarinette","Saxophone","Trombone"],
-		answer:3
-		}
-	],
 	demo:[
 		{
 		img:"gone.jpg",
