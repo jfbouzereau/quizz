@@ -124,7 +124,7 @@
 			font-size: 5vw;
 			font-family: myfont;
 			text-align: left;
-			padding: 20px;
+			height:12vh;
 		}
 
 		.games {
@@ -318,17 +318,23 @@
 
 		var msg = JSON.parse(event.data);
 		console.log("MESSAGE " + event.data);
+
 		switch (msg.type) {
 			case "mobile":
+				// no new player when game is started
 				if(qindex>=0) break;
+
 				var prompt = i18n(I_TEAM);
 				send({ type: "welcome", id: msg.id, prompt: prompt });
 				break;
 
 			case "user":
+				// no new player when game is started
 				if(qindex>=0) break;
-				users.push({ name: msg.value, id: msg.id, score: 0 });
-				display_users("welcome");
+
+				var now = new Date().getTime();
+				users.push({ name:msg.value, id:msg.id, score:0 , time:now });
+				display_users("welcome","time");
 				send({
 					type: "status",
 					id: msg.id,
@@ -391,6 +397,8 @@
 
 	function start_game() {
 
+		show_page("NUL");
+
 		qindex = -1;
 
 		for(var i=0;i<users.length;i++)
@@ -405,6 +413,7 @@
 			questions[k2] = temp;
 		}
 
+		// shuffle choices
 		for (var k = 0; k < questions.length; k++)
 			shuffle_choices(questions[k]);
 
@@ -425,8 +434,10 @@
 
 		function onload() {
 			nimg++;
-			if (nimg == questions.length)
+			// when all images preloaded, show first question
+			if (nimg == questions.length) {
 				show_question(0);		
+			}
 		}
 
 	}
@@ -536,7 +547,7 @@
 
 	function show_score() {
 
-		display_users("score");
+		display_users("score","score");
 		show_page("score");
 
 		for (var i = 0; i < users.length; i++) {
@@ -649,14 +660,13 @@
 
 	// ***************************************************************************
 
-	function display_users(page) {
-		var w = window.innerWidth/2;
+	function display_users(page,key) {
 
-		var tr = document.querySelectorAll("#" + page + " .users tr");
-		if (tr.length > 1)
-			var h = tr[1].offsetTop - tr[0].offsetTop - 5;
-		else
-			var h = 60;
+		// sort users by decreasing key value
+		users.sort( function(ua,ub) { return ub[key]-ua[key] });
+
+		var w = window.innerWidth/2;
+		var h = window.innerHeight/12;
 
 		var table = document.querySelector("#" + page + " .users");
 		var s = ""
@@ -670,16 +680,24 @@
 
 		if(!questions) return;
 
+
 		var dx = w / questions.length;
 
 		var c = document.querySelectorAll("#" + page + " .users canvas");
 		for (var i = 0; i < users.length; i++) {
+
 			var ctx = c[i].getContext("2d");
 			ctx.fillStyle = "white";
 			ctx.fillRect(0, 0, w, h);
 
+			ctx.strokeStyle = "#DDD";
+			for (var j=0 ; j<questions.length;j++) {
+				var x = dx * j;
+				ctx.strokeRect(dx * j, 0, dx - 5, h);
+			}
+
 			ctx.fillStyle = "#DDD";
-			for (var j = 0; j < questions.length; j++) {
+			for (var j = 0; j < qindex+1 ; j++) {
 				var x = dx * j;
 				ctx.fillRect(dx * j, 0, dx - 5, h);
 			}
