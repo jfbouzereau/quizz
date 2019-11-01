@@ -64,7 +64,7 @@
 			font-size:5vw;
 			position:absolute;
 			left:50%;
-			top:50%;
+			top:54%;
 			width:100%;
 			transform: translate(-50%,-50%);
 			transition: font-size 0.5s;
@@ -156,19 +156,20 @@
 			top: 0px;
 			left: 0px;
 			width: 100%;
-			height: 80px;
+			height: 12vh;
 			border-collapse: collapse;
 			background-color: #AAA;
 			color: white;
+			display:flex;
+			justify-content:center;
+			align-items:center;
 		}
-
-		.header tr td {
+		
+		.header span {
 			text-align: center;
 			font-family: myfont;
-			font-size: 5vw;
+			font-size: 10vh;
 			letter-spacing: 2px;
-			padding-top: 10px;
-			padding-bottom: 10px;
 		}
 
 		.footer {
@@ -177,21 +178,15 @@
 			left: 0px;
 			width: 100%;
 			height: 12vh;
-			border-collapse: collapse;
 			background-color: #AAA;
-		}
-
-		.footer tr td {
-			text-align: center;
-			font-family: myfont;
-			font-size: 36px;
-			padding-top: 10px;
-			padding-bottom: 10px;
+			display:flex;
+			justify-content:center;
+			align-items:center;
 		}
 
 		.footer button {
 			font-size: 5vh;
-			font-family: inherit;
+			font-family: myfont;
 			border-radius: 10px;
 			padding-left: 25vw;
 			padding-right: 25vw;
@@ -219,24 +214,20 @@
 <body>
 
 	<div class="page" id="welcome">
-		<table class="header" width="100%" border="0">
-			<tr>
-				<td></td>
-			</tr>
-		</table>
+		<div class="header">
+			<span></span>
+		</div>
 		<table class="users" width="100%" border="0">
 		</table>
-		<table class="footer" width="100%" border="0">
-			<tr>
-				<td> <button>OK</button> </td>
-			</tr>
-		</table>
+		<div class="footer">
+			<button>OK</button>
+		</div>
 	</div>
 
 	<div class="page" id="games">
-		<table class="header" width="100%" border="0">
-			<tr><td></td></tr>
-		</table>
+		<div class="header">
+			<span></span>
+		</div>
 		<table class="games" width="100%" border="0">
 		</table>
 	</div>
@@ -264,12 +255,10 @@
 		</div>
 	</div>
 
-	<div class="page" id="score">
-		<table class="header" width="100%" border="0">
-			<tr>
-				<td>SCORE</td>
-			</tr>
-		</table>
+	<div class="page" id="score">	
+		<div class="header">
+			<span>SCORE</span>
+		</div>
 		<table class="users" width="100%" border="0">
 		</table>
 	</div>
@@ -301,7 +290,7 @@
 	var images = [];		// preloaded images
 
 
-	document.querySelector("#welcome .header tr td").innerText = location.href;
+	document.querySelector("#welcome .header span").innerText = location.href;
 
 	document.querySelector("#welcome button").addEventListener("click",
 		show_games);
@@ -392,7 +381,7 @@
 
 		function f3() {
 
-			var td = document.querySelector("#games .header tr td");
+			var td = document.querySelector("#games .header span");
 			td.innerText = i18n(I_GAMES);
 	
 			var table = document.querySelector("#games table.games");
@@ -749,10 +738,10 @@
 		}
 
 		if (qindex == questions.length - 1)
-			document.querySelector("#score .header tr td").innerText =
+			document.querySelector("#score .header span").innerText =
 				i18n(I_FSCORE);
 		else
-			document.querySelector("#score .header tr td").innerText =
+			document.querySelector("#score .header span").innerText =
 				i18n(I_SCORE);
 	}
 
