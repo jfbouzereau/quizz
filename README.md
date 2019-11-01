@@ -87,7 +87,7 @@ a games.json and the directories of the various games.
 
 ## TRY ONLINE
 
-You can try the demo : [here](http://lerallyemobilefr:8000)
+You can try the demo : [here](http://lerallyemobile.fr:8000)
 
 ## ACKNOWLEDGEMENT
 
