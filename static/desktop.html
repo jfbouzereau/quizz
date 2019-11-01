@@ -17,7 +17,12 @@
 		}
 
 		.page {
-			width: 100%;
+			display:none;
+			position:fixed;
+			left:0px;
+			top:0px;
+			width:100%;
+			height:100%;
 		}
 
 		#question {
@@ -171,7 +176,7 @@
 			bottom: 0px;
 			left: 0px;
 			width: 100%;
-			height: 80px;
+			height: 12vh;
 			border-collapse: collapse;
 			background-color: #AAA;
 		}
@@ -185,7 +190,7 @@
 		}
 
 		.footer button {
-			font-size: 5vw;
+			font-size: 5vh;
 			font-family: inherit;
 			border-radius: 10px;
 			padding-left: 25vw;
@@ -203,10 +208,6 @@
 			width: 100%;
 			height: 100%;
 			background-color: #FFFC;
-		}
-
-		.page {
-			display: none;
 		}
 
 		#welcome button:disabled {
@@ -274,8 +275,8 @@
 	</div>
 
 </body>
+<script src="zip.js"></script>
 <script src="i18n.js"></script>
-<script src="games.js"></script>
 <script>
 	var delay = 10; // each question is proposed during 10 seconds
 
@@ -284,16 +285,20 @@
 	var WebSocket = window.WebSocket || window.MozWebSocket;
 	var cn = new WebSocket("ws://" + document.location.host);
 
+	var games = null;
+	var gindex= -1;
+
 	var questions = null;
 	var qindex = -1;
+
 	var canreply = false;
 
 	var t1 = null;	// start of game
 
 	var users = [];
 
+	var preload = default_preloader;
 	var images = [];		// preloaded images
-
 
 
 	document.querySelector("#welcome .header tr td").innerText = location.href;
@@ -304,6 +309,8 @@
 	document.querySelector("#games table.games").addEventListener("click",
 		select_game);
 
+	document.querySelector("#games").addEventListener("dragover",ondrag);
+	document.querySelector("#games").addEventListener("drop",ondrop);
 
 	show_page("welcome");
 
@@ -367,35 +374,59 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function show_games() {
-		var td = document.querySelector("#games .header tr td");
-		td.innerText = i18n(I_GAMES);
-	
-		var table = document.querySelector("#games table.games");
-		var s = "";
-		for(var g in games) {
-			s += "<tr><td>"+g+"</td></tr>";
-		}
-		table.innerHTML = s;
-		show_page("games");
 
+		console.log("SHOW GAMES");
+		console.log(JSON.stringify(games));
+
+		if(games)
+			f3();
+		else
+			fetch("/games.json").then(f1).then(f2);
+
+		function f1(response) { return response.text() }
+
+		function f2(text) { games = JSON.parse(text); f3(); }
+
+		function f3() {
+
+			var td = document.querySelector("#games .header tr td");
+			td.innerText = i18n(I_GAMES);
+	
+			var table = document.querySelector("#games table.games");
+			var s = "";
+			for(var i=0;i<games.length;i++) 
+				s += "<tr><td>"+games[i].name+"</td></tr>";
+
+			table.innerHTML = s;
+			show_page("games");
+		}
 
 	}
 
-	// ***************************************************************************
+// ***************************************************************************
+
 	function select_game(event) {
+
 		var target = event.target;
 		if(target.tagName!="TD") return;
-		game = target.innerText;	
-		questions = games[game];
-		start_game();
+
+		for(var i=0;i<games.length;i++) 
+			if(games[i].name==target.innerText) 
+				start_game(i);
 	}
 
-	// ***************************************************************************
+// ***************************************************************************
 
-	function start_game() {
+	function start_game(index) {
+
+		gindex = index;
+
+		var game = games[gindex];
+
+		questions = game.questions;
 
 		show_page("NUL");
 
@@ -404,7 +435,7 @@
 		for(var i=0;i<users.length;i++)
 			users[i].score = 0;
 
-		// shuffle questions
+	// shuffle questions
 		for (var k = 0; k < questions.length; k++) {
 			var k1 = (Math.random() * questions.length) | 0;
 			var k2 = (Math.random() * questions.length) | 0;
@@ -413,33 +444,13 @@
 			questions[k2] = temp;
 		}
 
-		// shuffle choices
+	// shuffle choices
 		for (var k = 0; k < questions.length; k++)
 			shuffle_choices(questions[k]);
 
-
-		var nimg = 0;
-
 		document.querySelector("#welcome button").disabled = true;
 
-
-		// preload images
-		for (var i = 0; i < questions.length; i++) {
-			var image = new Image();
-			image.addEventListener("load", onload);
-			image.src = game + "/" + questions[i].img;
-			images.push(image);
-		}
-
-
-		function onload() {
-			nimg++;
-			// when all images preloaded, show first question
-			if (nimg == questions.length) {
-				show_question(0);		
-			}
-		}
-
+		preload();
 	}
 
 	function failure(err) {
@@ -447,7 +458,33 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
+
+	function default_preloader() {
+
+	images = [];
+	var nimg = 0;
+
+	var game = games[gindex];
+
+	for (var i = 0; i < questions.length; i++) {
+		var image = new Image();
+		image.addEventListener("load", onload);
+		image.addEventListener("error", onload);
+		image.src = game.name + "/" + questions[i].img;
+		images.push(image);
+	}
+
+
+	function onload() {
+		nimg ++;
+		if(nimg==questions.length)
+			show_question(0);		
+		}
+
+	}
+
+// ***************************************************************************
 
 	function shuffle_choices(question) {
 
@@ -463,9 +500,11 @@
 
 	}
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function show_question(index) {
+
+		var game = games[gindex];
 
 		qindex = index;
 		var question = questions[index];
@@ -474,7 +513,7 @@
 			users[i].rep = null;
 
 		document.querySelector("#question img").height = 0;
-		document.querySelector("#question img").src = game + "/" + question.img;
+		document.querySelector("#question img").src = images[index].src;
 		document.querySelector("#r1 span").innerText = question.choices[0];
 		document.querySelector("#r2 span").innerText = question.choices[1];
 		document.querySelector("#r3 span").innerText = question.choices[2];
@@ -530,7 +569,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function finish_question() {
 		canreply = false;
@@ -543,7 +582,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function show_score() {
 
@@ -566,7 +605,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function format_reply(rep) {
 		if (rep == null)
@@ -576,7 +615,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function next_question() {
 		if (qindex + 1 >= questions.length)  
@@ -586,7 +625,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function show_page(name) {
 		document.body.style.opacity = 0;
@@ -609,7 +648,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function start_chrono() {	
 		t1 = new Date().getTime();
@@ -618,7 +657,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function draw_chrono() {
 		
@@ -649,7 +688,7 @@
 	}
 
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function get_user(msg) {
 		for (var i = 0; i < users.length; i++)
@@ -658,11 +697,11 @@
 		return null;
 	}
 
-	// ***************************************************************************
+// ***************************************************************************
 
 	function display_users(page,key) {
 
-		// sort users by decreasing key value
+	// sort users by decreasing key value
 		users.sort( function(ua,ub) { return ub[key]-ua[key] });
 
 		var w = window.innerWidth/2;
@@ -716,6 +755,99 @@
 			document.querySelector("#score .header tr td").innerText =
 				i18n(I_SCORE);
 	}
+
+// ***************************************************************************
+
+function ondrag(event) {
+
+	event.preventDefault();
+
+}
+
+// ***************************************************************************
+
+function ondrop(event) {
+
+	event.preventDefault();
+
+	var entries = null;
+	var eindex = -1;		// index of json file 
+
+	if(event.dataTransfer.items)
+		var file = event.dataTransfer.items[0].getAsFile();
+	else
+		var file = event.dataTransfer.files[0];
+
+	try {
+		zip.createReader(new zip.BlobReader(file), f1);
+	}
+	catch(err) {
+		alert(err);
+	}
+
+	function f1(reader) {		
+		reader.getEntries(f2);
+	}
+
+	function f2(ee) {
+		entries = ee;
+		for(var i=0;i<entries.length;i++) 
+			if(entries[i].filename.match(/\/games.json$/)) 
+				f3(i);
+	}
+
+	function f3(index) {
+		eindex = index;
+		entries[eindex].getData(new zip.TextWriter(), f4);	
+	}
+
+	function f4(text) {
+		try {
+			games = JSON.parse(text);
+			show_games();		
+			preload = zip_preloader;
+		}
+		catch(err) {
+			alert(err);
+		}
+	}
+
+	function zip_preloader() {
+
+		images = [];
+		var nimg = 0;
+
+		var URL = window.URL || window.webkit.URL;
+
+		var game = games[gindex];
+				
+		var prefix = entries[eindex].filename.replace(/games.json$/,"");
+
+		for(var i=0;i<questions.length;i++)  {
+			var target = prefix+game.name+"/"+questions[i].img;
+			for(var j=0;j<entries.length;j++)  {
+				if(entries[j].filename==target) {
+					entries[j].getData(new zip.BlobWriter(),function(blob) {
+						var image = new Image();
+						image.onload = onload;
+						image.onerror = onload;
+						image.src = URL.createObjectURL(blob);	
+						images.push(image);
+					});
+				}
+			}
+			
+		}
+
+		function onload() {
+			nimg++;
+			if(nimg==questions.length)
+				show_question(0);
+		}
+	}
+
+
+}
 
 // ***************************************************************************
 

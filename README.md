@@ -36,10 +36,10 @@ with 20 questions in french.
 To create a game named `mygame` for example :
 * create a subdirectory `mygame` in the directory `static`
 * put the pictures of all the questions in this subdirectory
-* modify the file `static/games.js` :
+* modify the file `static/games.json` :
 ```
-var games = {
-	mygame : [
+	[{"name":"mygame",
+		"questions":[
 		{
 		img:"picture1.jpg",
 		choices:["choice1of1","choice2of1","choice3of1","choice4of1"],
@@ -51,11 +51,12 @@ var games = {
 		answer:4
 		},
 		...
-	],
-	anothergame : [
+	]}
+	,
+	{"name":"anothergame",
 	...
-	]
-}
+	}
+]
 ```
 ## USAGE
 
@@ -81,7 +82,8 @@ http://myaddress:8000
 
 * click OK
 
-* choose the game to be played in the menu
+* choose the game to be played in the menu, or drop a zip file containing
+a games.json and the directories of the various games.
 
 
 
