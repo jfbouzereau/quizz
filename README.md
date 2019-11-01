@@ -85,6 +85,9 @@ http://myaddress:8000
 * choose the game to be played in the menu, or drop a zip file containing
 a games.json and the directories of the various games.
 
+## TRY ONLINE
+
+You can try the demo : [here](http://lerallyemobilefr:8000)
 
 ## ACKNOWLEDGEMENT
 
