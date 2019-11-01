@@ -129,7 +129,7 @@
 			font-size: 5vw;
 			font-family: myfont;
 			text-align: left;
-			height:12vh;
+			height:10vh;
 		}
 
 		.games {
@@ -168,7 +168,7 @@
 		.header span {
 			text-align: center;
 			font-family: myfont;
-			font-size: 10vh;
+			font-size: 9vh;
 			letter-spacing: 2px;
 		}
 
@@ -694,7 +694,7 @@
 		users.sort( function(ua,ub) { return ub[key]-ua[key] });
 
 		var w = window.innerWidth/2;
-		var h = window.innerHeight/12;
+		var h = (window.innerHeight*10/100)|0;
 
 		var table = document.querySelector("#" + page + " .users");
 		var s = ""
