@@ -86,5 +86,10 @@ http://myaddress:8000
 a games.json and the directories of the various games.
 
 
+## ACKNOWLEDGEMENT
+
+When a local zip file in dropped onto the interface, the file in
+uncompressed with the help of the [zip.js](https://github.com/gildas-lormeau/zip.js) library by Gildas Lormeau.
+
 
 	
