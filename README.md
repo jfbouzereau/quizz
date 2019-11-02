@@ -31,33 +31,49 @@ can be customized and adapted to your language.
 ## GAME PREPARATION
 
 Currently, the archive comes with a short game named `demo`
-with 20 questions in french.
+with 20 questions in french. 
+
+You can either modify the server
+to permanently include other games, or have a local file on your desktop
+to be used temporarily.
+
+### ON THE SERVER
 
 To create a game named `mygame` for example :
 * create a subdirectory `mygame` in the directory `static`
 * put the pictures of all the questions in this subdirectory
-* modify the file `static/games.json` :
+* modify the file `static/games.json` to contain the list of games :
 ```
-	[{"name":"mygame",
+	[
+		{"name":"mygame",
 		"questions":[
+			{
+			img:"picture1.jpg",
+			choices:["choice1of1","choice2of1","choice3of1","choice4of1"],
+			answer:2	
+			},
+			{
+			img:"picture2.jpg",
+			choices:["choice1of2","choice2of2","choice3of2","choice4of2"],
+			answer:4
+			},
+			...
+			]
+		}
+		,
 		{
-		img:"picture1.jpg",
-		choices:["choice1of1","choice2of1","choice3of1","choice4of1"],
-		answer:2	
-		},
-		{
-		img:"picture2.jpg",
-		choices:["choice1of2","choice2of2","choice3of2","choice4of2"],
-		answer:4
-		},
-		...
-	]}
-	,
-	{"name":"anothergame",
+		"name":"anothergame",
 	...
-	}
-]
+		}
+	]
 ```
+
+### ON THE DESKTOP
+
+If you are not able/willing to change the server, you can create 
+on your desktop a zip archive containing the file `games.json`  and
+the directories of the various games. 
+
 ## USAGE
 
 The main display and the smartphones must have access to the server. They can be on the same wifi network for example. But you can also use 
@@ -82,8 +98,8 @@ http://myaddress:8000
 
 * click OK
 
-* choose the game to be played in the menu, or drop a zip file containing
-a games.json and the directories of the various games.
+* choose the game to be played in the menu, or drop the zip file
+prepared in the above step.
 
 ## TRY ONLINE
 
