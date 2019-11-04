@@ -274,6 +274,8 @@
 	var WebSocket = window.WebSocket || window.MozWebSocket;
 	var cn = new WebSocket("ws://" + document.location.host);
 
+	var gid = null;
+
 	var games = null;
 	var gindex= -1;
 
@@ -290,7 +292,6 @@
 	var images = [];		// preloaded images
 
 
-	document.querySelector("#welcome .header span").innerText = location.href;
 
 	document.querySelector("#welcome button").addEventListener("click",
 		show_games);
@@ -316,12 +317,18 @@
 		console.log("MESSAGE " + event.data);
 
 		switch (msg.type) {
+			case "gid":
+				gid = msg.value;
+				var banner = document.querySelector("#welcome .header span");
+				banner.innerText = location.href+gid;
+				break;
+				
 			case "mobile":
 				// no new player when game is started
 				if(qindex>=0) break;
 
 				var prompt = i18n(I_TEAM);
-				send({ type: "welcome", id: msg.id, prompt: prompt });
+				send({ type: "welcome", pid: msg.pid, prompt: prompt });
 				break;
 
 			case "user":
@@ -329,11 +336,11 @@
 				if(qindex>=0) break;
 
 				var now = new Date().getTime();
-				users.push({ name:msg.value, id:msg.id, score:0 , time:now });
+				users.push({ name:msg.value, pid:msg.pid, score:0 , time:now });
 				display_users("welcome","time");
 				send({
 					type: "status",
-					id: msg.id,
+					pid: msg.pid,
 					line1: i18n(I_WELCOME, msg.value),
 					line2: "",
 					line3: i18n(I_WAIT, 1)
@@ -349,7 +356,7 @@
 					user.score++;
 				send({
 					type: "status",
-					id: msg.id,
+					pid: msg.pid,
 					line1: format_reply(msg.value),
 					line2: i18n(I_THANKS),
 					line3: ""
@@ -582,7 +589,7 @@
 			var user = users[i];
 			var msg = {
 				type: "status",
-				id: user.id,
+				pid: user.pid,
 				line1: format_reply(user.rep),
 				line2: i18n(I_USCORE, user.score + " / " + questions.length),
 				line3: (qindex + 1 >= questions.length) ? "" : i18n(I_WAIT, qindex + 2)
@@ -681,7 +688,7 @@
 
 	function get_user(msg) {
 		for (var i = 0; i < users.length; i++)
-			if (users[i].id == msg.id)
+			if (users[i].pid == msg.pid)
 				return users[i];
 		return null;
 	}

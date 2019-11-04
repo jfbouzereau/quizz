@@ -151,7 +151,6 @@ body {
 	<div id="three" class="part"><div class="content"></div></div>
 </div>
 </body>
-<script src="i18n.js"></script>
 <script>
 var logged = false;
 var COLORS = ["#FF8","#88F","#8F8","#F88"];
@@ -223,7 +222,9 @@ function onchange() {
 
 
 function onopen() {
-	send({type:"mobile"});
+	// last part of url is game id
+	var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
+	send({type:"mobile",gid:gid});
     }
 
 function onerror(err) {
@@ -231,8 +232,9 @@ function onerror(err) {
 
 function onmessage(event) {
 
+	console.log("MESSAGE "+event.data);
     var msg = JSON.parse(event.data);
-	console.log("MESSAGE "+msg);
+
 	switch(msg.type) {
 		case "welcome":	
 			document.querySelector("#welcome .prompt").innerText = msg.prompt;
@@ -278,7 +280,11 @@ function show_status(line1,line2,line3) {
 }
 
 function send(msg) {
-	cn.send(JSON.stringify(msg));
+	try {
+		cn.send(JSON.stringify(msg));
+		}
+	catch(err) {
+		}
 }
 </script>
 </html>
