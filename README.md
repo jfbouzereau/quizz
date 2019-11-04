@@ -76,22 +76,27 @@ the directories of the various games.
 
 ## USAGE
 
-The main display and the smartphones must have access to the server. They can be on the same wifi network for example. But you can also use 
-[ngrok](https://ngrok.com) to expose the server at a public address.
+The main display and the smartphones must have access to the server. 
+For example they can be on the same wifi network.  
+But you can also use [ngrok](https://ngrok.com) to expose the server at a public address.
 
 * Run the server :
 ```
 node server.js
 ```
 
-* on the desktop browser open the main page :
+* in the desktop browser open the main page :
 ```
 http://myaddress:8000
 ```
+The url to be used by the smartphones is displayed in the header.  
+If you move the mouse over this header,
+the corresponding qrcode is displayed, to make
+smartphone connections easer.
 
 * on each smarphone open the page
 ```
-http://myaddress:8000
+http://myaddress:8000/xyz  ( as displayed on the desktop )
 ```
 
 * wait for each player to be connected
