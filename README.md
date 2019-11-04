@@ -84,7 +84,7 @@ The main display and the smartphones must have access to the server. They can be
 node server.js
 ```
 
-* on the desktop brower open the main page :
+* on the desktop browser open the main page :
 ```
 http://myaddress:8000
 ```
@@ -110,5 +110,5 @@ You can try the demo : [here](http://lerallyemobile.fr:8000)
 When a local zip file in dropped onto the interface, the file in
 uncompressed with the help of the [zip.js](https://github.com/gildas-lormeau/zip.js) library by Gildas Lormeau.
 
-
+The initial QRCode is displayed with David Shim's [QRCode.js](https://davidshimjs.github.io/qrcodejs/)
 	

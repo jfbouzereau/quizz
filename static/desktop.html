@@ -208,10 +208,29 @@
 		#welcome button:disabled {
 			color: #BBB;
 		}
+
+		#qrcode {
+			display:none;
+			position:fixed;
+			left:0px;
+			top:12vh;
+			bottom:12vh;
+			width:100%;
+			border:1px solid #AAA;
+			background-color:white;
+		}
+
+		#area {
+			position:absolute;
+		}
 	</style>
 </head>
 
 <body>
+
+	<div id="qrcode">
+		<div id="area"></div>
+	</div>
 
 	<div class="page" id="welcome">
 		<div class="header">
@@ -264,6 +283,7 @@
 	</div>
 
 </body>
+<script src="qrcode.js"></script>
 <script src="zip.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -292,6 +312,11 @@
 	var images = [];		// preloaded images
 
 
+	document.querySelector("#welcome .header").addEventListener("mouseenter",
+		show_qrcode);
+
+	document.querySelector("#welcome .header").addEventListener("mouseleave",
+		hide_qrcode);
 
 	document.querySelector("#welcome button").addEventListener("click",
 		show_games);
@@ -849,6 +874,48 @@ function ondrop(event) {
 
 function send(msg){
 	cn.send(JSON.stringify(msg));
+}
+
+// ***************************************************************************
+
+function show_qrcode() {
+
+	var qdiv = document.querySelector("#qrcode");
+	qdiv.style.display = "block";
+
+	var rect = qdiv.getBoundingClientRect();
+
+	var width = rect.width|0;
+	var height = rect.height|0;
+	if(height>width)
+		height=width;
+	else if(width>height)
+		width=height;
+
+	width -= 40;
+	height -= 40;
+
+	var area = document.querySelector("#area");
+	area.innerHTML = "";
+
+	area.style.top = ((rect.height/2 - height/2)|0)+"px";
+	area.style.left = ((rect.width/2 - width/2)|0)+"px";
+
+	var qrcode = new QRCode(area, {
+		text:location.href + gid,
+		width:width,
+		height:height,
+		colorDark: "#000000",
+		colorLight:"#FFFFFF",
+		correctLevel: QRCode.CorrectLevel.H
+	});
+}
+
+// ***************************************************************************
+
+function hide_qrcode() {
+
+	document.querySelector("#qrcode").style.display = "none";
 }
 
 // ***************************************************************************
