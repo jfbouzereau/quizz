@@ -58,6 +58,7 @@
 			font-size: 36px;
 			color: #333;
 			line-height: 78px;
+			overflow:hidden;
 		}
 
 		#choices .rect span {
@@ -218,6 +219,7 @@
 			width:100%;
 			border:1px solid #AAA;
 			background-color:white;
+			z-index:10;
 		}
 
 		#area {
@@ -287,7 +289,7 @@
 <script src="zip.js"></script>
 <script src="i18n.js"></script>
 <script>
-	var delay = 10; // each question is proposed during 10 seconds
+	var delay = 15; // each question is proposed during 15 seconds
 
 	var canvas = document.querySelector("#chrono canvas");
 
