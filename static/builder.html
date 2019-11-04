@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+        @font-face {
+            font-family: myfont;
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/josefinslab/v10/lW-5wjwOK3Ps5GSJlNNkMalnqg6q.ttf);
+        }
+body {
+	margin:0px;
+	padding:0px;
+}
+.page {
+	position:fixed;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+}
+.header {
+	position:fixed;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:12vh;
+	background-color:#AAA;
+	color:white;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
+.header input {
+	text-align:center;
+	font-family:myfont;
+	font-size:9vh;
+	letter-spacing:2px;
+	background-color:transparent;
+	color:white;
+}
+
+.footer {
+	position:fixed;
+	bottom:0px;
+	left:0px;
+	width:100%;
+	height:12vh;
+	background-color:#AAA;
+	display:flex;
+}
+
+.train {
+	width:100%;
+}
+
+.content {
+	position:fixed;
+	top:12vh;
+	bottom:12vh;
+	left:0px;
+	width:100%;
+}
+
+.content .picture {
+	position:absolute;
+	top:0px;
+	left:50%;
+	width:50%;
+	height:100%;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
+
+.content input {
+	position:absolute;
+	left:10px;
+	width:50%;
+	height:22%;
+	font-family:myfont;
+	font-size:7vh;
+}
+
+#r1 {
+	top:1%;
+}
+
+#r2 {
+	top:26%;
+}
+
+#r3 {
+	top:51%;
+}
+
+#r4 {
+	top:76%;
+}
+
+.film {
+	width:100%;
+	background-color:red;
+	display:flex;
+}
+
+.buttons {
+	display:flex;
+	justify-content:space-around;
+	align-items:center;
+}
+
+.buttons button {
+	width:8vh;
+	height:8vh;
+	border-radius:5px;
+	font-size:6vh;
+	color:white;
+	margin:10px;
+}
+
+</style>
+</head>
+<body>
+	<div class="page" id="main">
+		<div class="header">
+			<input type="text" value="Questionnaire"></input>
+		</div>
+		<div class="content">
+			<input id="r1" type="text" placeholder="Bonne réponse"></input>
+			<input id="r2" type="text" placeholder="Mauvaise réponse"></input>
+			<input id="r3" type="text" placeholder="Mauvaise réponse"></input>
+			<input id="r4" type="text" placeholder="Mauvaise réponse"></input>
+			<div class="picture">
+			</div>
+		</div>
+		<div class="footer">
+			<div class="train">
+			</div>
+			<div class="buttons">
+				<button class="plus">✚</button>
+				<button class="minus">-</button>
+				<button class="down">⬇︎</button>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="zip.js"></script>
+<script>
+
+var questions = [];
+
+var question = null;	// question being edited
+
+//**************************************************************************
+
+var picture = document.querySelector(".picture");
+picture.addEventListener("dragover",ondrag);
+picture.addEventListener("drop",ondrop);
+
+
+document.querySelector("button.plus").addEventListener("click",onplus);
+document.querySelector("button.minus").addEventListener("click",onminus);
+document.querySelector("button.down").addEventListener("click",ondown);
+
+//**************************************************************************
+
+function ondrag(event) {
+	event.preventDefault();
+
+	document.querySelector(".picture").style.backgroundColor = "#blue";
+}
+
+//**************************************************************************
+
+function ondrop(event) {
+
+	event.preventDefault();
+
+	if(event.dataTransfer.items)
+		var file = event.dataTransfer.items[0].getAsFile();
+	else
+		var file = event.dataTransfer.files[0];
+
+	var reader = new FileReader();
+	reader.addEventListener("load",onload1);
+	reader.addEventListener("error",onerror);
+	reader.readAsDataURL(file);
+
+	// get actual size of image
+	var image;
+	function onload1(event) {
+		image = new Image();
+		image.addEventListener("load",onload2);
+		image.addEventListener("error",onerror);
+		image.src = event.target.result;
+	}
+
+	function onload2(event) {
+		var iw = image.naturalWidth;
+		var ih = image.naturalHeight;
+		var rect = document.querySelector(".picture").getBoundingClientRect();
+		var width = rect.width;
+		var height = width*ih/iw;
+		if(height>rect.height) {
+				height = rect.height;
+				width = height*iw/ih;
+		}
+
+		var img = document.createElement("img");
+		img.width = width|0;
+		img.height = height|0;
+		img.src = image.src;
+
+		var picture = document.querySelector(".picture");
+		picture.innerHTML = "";
+		picture.appendChild(img);
+
+		question = {file:file,image:image};
+	}
+
+	function onerror(err) {
+		alert(err);
+		question = null;
+	}
+}
+
+//**************************************************************************
+
+function onplus(event) {
+
+	if(!question) return;
+
+	var r1 = document.querySelector("#r1");
+	var r2 = document.querySelector("#r2");
+	var r3 = document.querySelector("#r3");
+	var r4 = document.querySelector("#r4");
+
+	if(!r1.value) return;
+	if(!r2.value) return;
+	if(!r3.value) return;
+	if(!r4.value) return;
+
+	question.choices = [r1.value,r2.value,r3.value,r4.value];
+
+	questions.push(question);
+
+	update_train();
+
+	document.querySelector(".picture img").remove();
+	question = null;
+	r1.value = "";
+	r2.value = "";
+	r3.value = "";
+	r4.value = "";
+}
+
+//**************************************************************************
+
+function onminus(event) {
+}
+
+//**************************************************************************
+
+function ondown(event) {
+
+	var name = document.querySelector(".header input").value;
+
+	var game = { name:name, questions:[] };
+
+	for(var i=0;i<questions.length;i++)
+		game.questions.push({img:questions[i].file.name,choices:questions[i].choices,answer:1});
+
+	var text = JSON.stringify([game]);
+
+	zip.createWriter(new zip.BlobWriter("application/zip"),f1);
+
+	var index = -1;
+
+	function f1(writer) {
+		writer.add("quizz/",null,f2,{directory:true});
+
+		function f2() {
+			writer.add("quizz/games.json",new zip.TextReader(text),f3);
+		}
+
+		function f3() {
+			writer.add("quizz/"+game.name+"/",null,f4,{directory:true});
+		}
+
+		function f4() {
+			index++;
+			if(index>=questions.length) return writer.close(download);
+			writer.add("quizz/"+game.name+"/"+questions[index].file.name,
+				new zip.Data64URIReader(questions[index].image.src),f4);
+		}
+
+	}
+
+	function download(blob) {
+		var URL = window.URL || window.webkit.URL;
+		var url = URL.createObjectURL(blob);
+
+		var a = document.createElement("a");
+		a.style.display = "none";
+		document.body.appendChild(a);
+
+		a.href = url
+		a.download = "game.zip";
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+}
+
+//**************************************************************************
+
+function update_train() {
+
+	var train = document.querySelector(".train");
+
+	var rect = train.getBoundingClientRect();
+
+	train.innerHTML = "";
+
+	for(var i=0;i<questions.length;i++) {
+		var img = document.createElement("img");
+		img.src = questions[i].image.src;
+		img.height = rect.height;
+		train.appendChild(img);
+		var space = document.createElement("span");
+		space.innerHTML = "&nbsp;"
+		train.appendChild(space);
+	}
+
+}
+
+//**************************************************************************
+
+
+</script>
+</html>
+
