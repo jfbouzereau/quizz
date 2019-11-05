@@ -114,10 +114,17 @@ body {
 .buttons button {
 	width:8vh;
 	height:8vh;
-	border-radius:5px;
+	border-radius:10px;
 	font-size:6vh;
 	color:white;
 	margin:10px;
+	border:2px solid white;
+	background-color:#AAA;
+}
+
+.buttons button:hover {
+	background-color:white;
+	color:#AAA;
 }
 
 </style>
@@ -139,9 +146,9 @@ body {
 			<div class="train">
 			</div>
 			<div class="buttons">
-				<button class="plus">✚</button>
-				<button class="minus">-</button>
-				<button class="down">⬇︎</button>
+				<button class="plus" title="Add/Replace">⬅︎</button>
+				<button class="minus" title="Remove">✖︎</button>
+				<button class="down" title="Download">⬇︎</button>
 			</div>
 		</div>
 	</div>
@@ -159,6 +166,7 @@ var picture = document.querySelector(".picture");
 picture.addEventListener("dragover",ondrag);
 picture.addEventListener("drop",ondrop);
 
+document.querySelector(".train").addEventListener("click",ontrain);
 
 document.querySelector("button.plus").addEventListener("click",onplus);
 document.querySelector("button.minus").addEventListener("click",onminus);
@@ -198,24 +206,8 @@ function ondrop(event) {
 	}
 
 	function onload2(event) {
-		var iw = image.naturalWidth;
-		var ih = image.naturalHeight;
-		var rect = document.querySelector(".picture").getBoundingClientRect();
-		var width = rect.width;
-		var height = width*ih/iw;
-		if(height>rect.height) {
-				height = rect.height;
-				width = height*iw/ih;
-		}
 
-		var img = document.createElement("img");
-		img.width = width|0;
-		img.height = height|0;
-		img.src = image.src;
-
-		var picture = document.querySelector(".picture");
-		picture.innerHTML = "";
-		picture.appendChild(img);
+		place_image(image);
 
 		question = {file:file,image:image};
 	}
@@ -244,21 +236,30 @@ function onplus(event) {
 
 	question.choices = [r1.value,r2.value,r3.value,r4.value];
 
-	questions.push(question);
+	if(!question.editing)
+		questions.push(question);
+	
+	delete question.editing;
 
 	update_train();
 
-	document.querySelector(".picture img").remove();
-	question = null;
-	r1.value = "";
-	r2.value = "";
-	r3.value = "";
-	r4.value = "";
+	clear();
 }
 
 //**************************************************************************
 
 function onminus(event) {
+
+	if(!question) return;
+	if(!question.editing) return;
+
+	var index = question.editing-1;
+
+	questions.splice(index,1);
+
+	update_train();
+
+	clear();
 }
 
 //**************************************************************************
@@ -327,11 +328,72 @@ function update_train() {
 		var img = document.createElement("img");
 		img.src = questions[i].image.src;
 		img.height = rect.height;
+		img.dataset.index = i;
 		train.appendChild(img);
 		var space = document.createElement("span");
 		space.innerHTML = "&nbsp;"
 		train.appendChild(space);
 	}
+
+}
+
+//**************************************************************************
+
+function ontrain(event) {
+
+	var target = event.target;
+	if(target.tagName!="IMG") return;
+
+	var index= target.dataset.index;
+	if(!index) return;
+
+	question = questions[index];
+	question.editing = parseInt(index)+1;
+
+	document.querySelector("#r1").value = question.choices[0];
+	document.querySelector("#r2").value = question.choices[1];
+	document.querySelector("#r3").value = question.choices[2];
+	document.querySelector("#r4").value = question.choices[3];
+
+	place_image(question.image);
+
+
+}
+
+//**************************************************************************
+
+function place_image(image) {
+
+	var iw = image.naturalWidth;
+	var ih = image.naturalHeight;
+	var rect = document.querySelector(".picture").getBoundingClientRect();
+	var width = rect.width;
+	var height = width*ih/iw;
+	if(height>rect.height) {
+		height = rect.height;
+		width = height*iw/ih;
+	}
+
+	var img = document.createElement("img");
+	img.width = width|0;
+	img.height = height|0;
+	img.src = image.src;
+
+	var picture = document.querySelector(".picture");
+	picture.innerHTML = "";
+	picture.appendChild(img);
+}
+
+//**************************************************************************
+
+function clear() {
+
+	document.querySelector(".picture img").remove();
+	question = null;
+	r1.value = "";
+	r2.value = "";
+	r3.value = "";
+	r4.value = "";
 
 }
 

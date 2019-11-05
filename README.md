@@ -22,7 +22,7 @@ dependencies (so far only express and ws are required).
 By default the server listens to port 8000. This can be changed 
 in `server.js` .
 
-The questions are proposed during 10 seconds. This can be changed
+The questions are proposed during 15 seconds. This can be changed
 in `static/desktop.html` .
 
 The interface is currently in french. The file `static/i18n.js`
@@ -33,9 +33,8 @@ can be customized and adapted to your language.
 Currently, the archive comes with a short game named `demo`
 with 20 questions in french. 
 
-You can either modify the server
-to permanently include other games, or have a local file on your desktop
-to be used temporarily.
+You can either modify the server to permanently include other games,  
+or have a local zip file on your desktop to be used temporarily (see below).
 
 ### ON THE SERVER
 
@@ -72,7 +71,9 @@ To create a game named `mygame` for example :
 
 If you are not able/willing to change the server, you can create 
 on your desktop a zip archive containing the file `games.json`  and
-the directories of the various games. 
+the directories of the various games.  
+
+This zip file can be created manually or with the `builder` tool (see below).
 
 ## USAGE
 
@@ -85,30 +86,49 @@ But you can also use [ngrok](https://ngrok.com) to expose the server at a public
 node server.js
 ```
 
-* in the desktop browser open the main page :
+* In the desktop browser open the main page :
 ```
 http://myaddress:8000
 ```
 The url to be used by the smartphones is displayed in the header.  
-If you move the mouse over this header,
-the corresponding qrcode is displayed, to make
-smartphone connections easer.
+It is the main url followed by a unique three-letter identifier,
+in order to allow multiple simultaneous games.
 
-* on each smarphone open the page
+If you move the mouse over this header, the corresponding qrcode is displayed,
+to make smartphone connections easer.
+
+* On each smarphone open the page
 ```
 http://myaddress:8000/xyz  ( as displayed on the desktop )
 ```
 
-* wait for each player to be connected
+* Wait for each player to be connected
 
-* click OK
+* Click OK
 
-* choose the game to be played in the menu, or drop the zip file
+* Choose the game to be played in the menu, or drop the zip file
 prepared in the above step.
 
 ## TRY ONLINE
 
 You can try the demo : [here](http://lerallyemobile.fr:8000)
+
+## BUILDER
+
+The local zip file can be created in the browser with the builder utility:
+```
+http://myaddress:8000/builder.html
+```
+* Change the name of the game by clicking on the title and typing the new name.
+
+* To add a question, drop a picture on the right side, and supply four choices
+on the left side, the correct answer being the first one. Then click the left arrow button. A thumbnail of the picture is added to the gallery.
+
+* To modify a question, click on the thumbnail in the gallery, modify the choices, then click the left arrow button.
+
+* To remove a question, click on the thumbnail in the gallery, then click on the cross button.
+
+* To download the zip archive, click the down arrow button.
 
 ## ACKNOWLEDGEMENT
 
