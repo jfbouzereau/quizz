@@ -209,7 +209,12 @@ function ondrop(event) {
 
 		place_image(image);
 
-		question = {file:file,image:image};
+		if(question && question.editing) {
+			question.file = file;
+			question.image = image;
+		}
+		else
+			question = {file:file,image:image};
 	}
 
 	function onerror(err) {
@@ -280,20 +285,20 @@ function ondown(event) {
 	var index = -1;
 
 	function f1(writer) {
-		writer.add("quizz/",null,f2,{directory:true});
+		writer.add(game.name+"/",null,f2,{directory:true});
 
 		function f2() {
-			writer.add("quizz/games.json",new zip.TextReader(text),f3);
+			writer.add(game.name+"/games.json",new zip.TextReader(text),f3);
 		}
 
 		function f3() {
-			writer.add("quizz/"+game.name+"/",null,f4,{directory:true});
+			writer.add(game.name+"/"+game.name+"/",null,f4,{directory:true});
 		}
 
 		function f4() {
 			index++;
 			if(index>=questions.length) return writer.close(download);
-			writer.add("quizz/"+game.name+"/"+questions[index].file.name,
+			writer.add(game.name+"/"+game.name+"/"+questions[index].file.name,
 				new zip.Data64URIReader(questions[index].image.src),f4);
 		}
 
@@ -308,8 +313,12 @@ function ondown(event) {
 		document.body.appendChild(a);
 
 		a.href = url
-		a.download = "game.zip";
-		a.click();
+		a.download = game.name+".zip";
+
+		var me = document.createEvent("MouseEvent");
+		me.initMouseEvent("click",true,true,window,0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		a.dispatchEvent(me);
+		
 		URL.revokeObjectURL(url);
 	}
 }
