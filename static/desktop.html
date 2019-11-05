@@ -739,9 +739,14 @@
 		var table = document.querySelector("#" + page + " .users");
 		var s = ""
 		for (var i = 0; i < users.length; i++) {
+			if(questions)
+				var post = users[i].score == questions.length ? "🏆":"";
+			else
+				var post = "";
+
 			s += "<tr>";
 			s += "<td><canvas width='" + w + "' height='" + h + "'></td>";
-			s += "<td>" + users[i].name + "</td>";
+			s += "<td>" + users[i].name + " &nbsp; "+post+"</td>";
 			s += "</tr>"
 		}
 		table.innerHTML = s;
