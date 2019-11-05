@@ -189,12 +189,18 @@
 			font-size: 5vh;
 			font-family: myfont;
 			border-radius: 10px;
-			padding-left: 25vw;
-			padding-right: 25vw;
+			padding-left: 15vw;
+			padding-right: 15vw;
 			background-color: inherit;
 			color: white;
 			padding-top:8px;
 			padding-bottom:8px;
+			border:2px solid white;
+		}
+
+		.footer button:hover {
+			background-color:white;
+			color:#AAA;
 		}
 
 		.mask {
@@ -203,7 +209,7 @@
 			top: 0px;
 			width: 100%;
 			height: 100%;
-			background-color: #FFFC;
+			background-color: #FFFD;
 		}
 
 		#welcome button:disabled {
@@ -814,9 +820,11 @@ function ondrop(event) {
 
 	function f2(ee) {
 		entries = ee;
-		for(var i=0;i<entries.length;i++) 
+		for(var i=0;i<entries.length;i++)  {
+			console.log("ENTRY "+i+" >>>"+entries[i].filename+"<<<");
 			if(entries[i].filename.match(/\/games.json$/)) 
 				f3(i);
+		}
 	}
 
 	function f3(index) {
@@ -837,8 +845,9 @@ function ondrop(event) {
 
 	function zip_preloader() {
 
+		console.log("ZIP PRELOADER");
+
 		images = [];
-		var nimg = 0;
 
 		var URL = window.URL || window.webkit.URL;
 
@@ -846,26 +855,30 @@ function ondrop(event) {
 				
 		var prefix = entries[eindex].filename.replace(/games.json$/,"");
 
-		for(var i=0;i<questions.length;i++)  {
-			var target = prefix+game.name+"/"+questions[i].img;
+		console.log("PREFIX "+prefix);
+
+		var qindex = -1;
+
+		preload_one();
+
+		function preload_one() {
+
+			qindex++;
+			if(qindex>=questions.length) return show_question(0);
+
+			var target = prefix+game.name+"/"+questions[qindex].img;
 			for(var j=0;j<entries.length;j++)  {
 				if(entries[j].filename==target) {
 					entries[j].getData(new zip.BlobWriter(),function(blob) {
 						var image = new Image();
-						image.onload = onload;
-						image.onerror = onload;
+						image.onload = preload_one;
+						image.onerror = preload_one;
 						image.src = URL.createObjectURL(blob);	
 						images.push(image);
 					});
+					break;
 				}
 			}
-			
-		}
-
-		function onload() {
-			nimg++;
-			if(nimg==questions.length)
-				show_question(0);
 		}
 	}
 
