@@ -196,11 +196,35 @@
 			padding-top:8px;
 			padding-bottom:8px;
 			border:2px solid white;
+			cursor:pointer;
 		}
 
 		.footer button:hover {
 			background-color:white;
 			color:#AAA;
+		}
+
+		.footer label {
+			font-size:6vh;
+			font-family:myfont;
+			color:white;
+			cursor:pointer;
+		}
+
+		.footer input {
+			opacity:0;
+		}
+
+		.footer input ~ .checkmark:after {
+			content: "✔︎";
+			font-family:myfont;
+			font-size:6vh;
+			color:white;
+			opacity:0;
+		}
+
+		.footer input:checked ~ .checkmark:after {
+			opacity:1;
 		}
 
 		.mask {
@@ -257,6 +281,11 @@
 		</div>
 		<table class="games" width="100%" border="0">
 		</table>
+		<div class="footer">
+			<input checked type="checkbox" name="showrep" id="showrep"/>
+			<span class="checkmark"></span>
+			<label for="showrep" ></label>
+		</div>
 	</div>
 	
 	<div class="page" id="pageq">
@@ -318,6 +347,7 @@
 
 	var preload = default_preloader;
 	var images = [];		// preloaded images
+
 
 
 	document.querySelector("#welcome .header").addEventListener("mouseenter",
@@ -406,6 +436,9 @@
 // ***************************************************************************
 
 	function show_games() {
+
+		var label = document.querySelector("#games label");
+		label.innerText = i18n(I_SHOW);
 
 		console.log("SHOW GAMES");
 		console.log(JSON.stringify(games));
@@ -601,13 +634,21 @@
 // ***************************************************************************
 
 	function finish_question() {
+
 		canreply = false;
 
-		for (var i = 1; i <= 4; i++)
-			if (i != questions[qindex].answer)
-				document.querySelector("#r" + i + " .mask").style.display = "block";
+		var showrep = document.querySelector("#games input").checked;
 
-		setTimeout(show_score, 4000);
+		if(showrep) {
+			for (var i = 1; i <= 4; i++)
+				if (i != questions[qindex].answer)
+					document.querySelector("#r" + i + " .mask").style.display = "block";
+
+			setTimeout(show_score, 4000);
+		}
+		else
+			setTimeout(show_score,0);
+
 	}
 
 
