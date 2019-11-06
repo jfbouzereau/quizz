@@ -22,9 +22,6 @@ dependencies (so far only express and ws are required).
 By default the server listens to port 8000. This can be changed 
 in `server.js` .
 
-The questions are proposed during 15 seconds. This can be changed
-in `static/desktop.html` .
-
 The interface is currently in french. The file `static/i18n.js`
 can be customized and adapted to your language.
 

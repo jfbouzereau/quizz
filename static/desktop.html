@@ -16,6 +16,15 @@
 			transition: opacity 0.1s;
 		}
 
+		.noselect {
+			-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+			-moz-user-select: none; /* Old versions of Firefox */
+			-ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+		}
+
 		.page {
 			display:none;
 			position:fixed;
@@ -135,9 +144,10 @@
 
 		.games {
 			position:fixed;
-			top:80px;
+			top:12vh;
 			width:100%;
 			left:0px;
+			bottom:12vh;
 		}
 
 		.games tr td {
@@ -211,20 +221,62 @@
 			cursor:pointer;
 		}
 
-		.footer input {
+		.setup {
+			position:fixed;
+			top:12vh;
+			width:100%;
+			left:0px;
+			bottom:12vh;
+			display:flex;
+			flex-direction:column;
+			justify-content:space-around;
+			align-items:center;
+		}
+
+		.setup input {
 			opacity:0;
 		}
 
-		.footer input ~ .checkmark:after {
+		.setup label {
+			font-family:myfont;
+			font-size:6vh;
+			color:#AAA;
+		}
+
+		.setup input ~ .checkmark:after {
 			content: "✔︎";
 			font-family:myfont;
 			font-size:6vh;
-			color:white;
+			color:#AAA;
 			opacity:0;
 		}
 
-		.footer input:checked ~ .checkmark:after {
+		.setup input:checked ~ .checkmark:after {
 			opacity:1;
+		}
+
+		.setup span.delay {
+			font-family:myfont;
+			font-size:6vh;
+			color:#AAA;
+		}
+
+		.setup button {
+			width:40px;
+			height:40px;
+			color:#AAA;
+			border:3px solid #AAA;
+			border-radius:5px;
+			background-color:white;
+			font-size:4vh;
+			margin-left:10px;
+			margin-right:10px;
+			cursor:pointer;
+		}
+
+		.setup button:hover {
+			background-color:#AAA;
+			color:white;
 		}
 
 		.mask {
@@ -282,12 +334,31 @@
 		<table class="games" width="100%" border="0">
 		</table>
 		<div class="footer">
-			<input checked type="checkbox" name="showrep" id="showrep"/>
-			<span class="checkmark"></span>
-			<label for="showrep" ></label>
+			<button></button>
 		</div>
 	</div>
-	
+
+	<div class="page" id="setup">
+		<div class="header">
+			<span></span>
+		</div>
+		<div class="setup noselect">
+			<div>
+				<button class="minus">-</button>
+				<span class="delay"></span>
+				<button class="plus">+</button>
+			</div>
+			<div>
+				<input checked type="checkbox" name="showrep" id="showrep"/>
+				<span class="checkmark"></span>
+				<label for="showrep" class="noselect" ></label>
+			</div>
+		</div>
+		<div class="footer">
+			<button>OK</button>
+		</div>
+	</div>
+
 	<div class="page" id="pageq">
 		<div id="chrono">
 			<canvas width="80" height"80" />
@@ -365,6 +436,13 @@
 	document.querySelector("#games").addEventListener("dragover",ondrag);
 	document.querySelector("#games").addEventListener("drop",ondrop);
 
+	document.querySelector("#games .footer button").addEventListener("click",onsetup);
+
+	document.querySelector(".setup button.minus").addEventListener("click",onminus);
+	document.querySelector(".setup button.plus").addEventListener("click",onplus);
+
+	document.querySelector("#setup .footer button").addEventListener("click",onsetupok);
+
 	show_page("welcome");
 
 
@@ -437,8 +515,8 @@
 
 	function show_games() {
 
-		var label = document.querySelector("#games label");
-		label.innerText = i18n(I_SHOW);
+		var button = document.querySelector("#games .footer button");
+		button.innerText = i18n(I_SETUP);
 
 		console.log("SHOW GAMES");
 		console.log(JSON.stringify(games));
@@ -637,7 +715,7 @@
 
 		canreply = false;
 
-		var showrep = document.querySelector("#games input").checked;
+		var showrep = document.querySelector("#setup input#showrep").checked;
 
 		if(showrep) {
 			for (var i = 1; i <= 4; i++)
@@ -977,6 +1055,54 @@ function show_qrcode() {
 function hide_qrcode() {
 
 	document.querySelector("#qrcode").style.display = "none";
+}
+
+// ***************************************************************************
+
+function onsetup() {
+
+	document.querySelector("#setup .header span").innerText = i18n(I_SETUP);
+	document.querySelector("#setup .setup label").innerText = i18n(I_SHOW);
+
+	show_delay();
+
+	show_page("setup");
+
+}
+
+// ***************************************************************************
+
+function onminus() {
+
+	if(delay>5)
+		delay -= 5;
+
+	show_delay();
+}
+
+// ***************************************************************************
+
+function onplus() {
+
+	delay += 5;
+
+	show_delay();
+}
+
+// ***************************************************************************
+
+function show_delay() {
+
+	document.querySelector(".setup .delay").innerText = i18n(I_DELAY,delay);
+
+}
+
+// ***************************************************************************
+
+function onsetupok() {
+
+	show_page("games");
+
 }
 
 // ***************************************************************************
