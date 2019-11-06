@@ -121,9 +121,10 @@
 
 		.users {
 			position: fixed;
-			top: 80px;
+			top: 12vh;
 			width: 100%;
 			left: 0px;
+			bottom:12vh;
 		}
 
 		.users thead {
@@ -584,9 +585,7 @@
 			questions[k2] = temp;
 		}
 
-	// shuffle choices
-		for (var k = 0; k < questions.length; k++)
-			shuffle_choices(questions[k]);
+		shuffle_choices();
 
 		document.querySelector("#welcome button").disabled = true;
 
@@ -628,14 +627,34 @@
 
 	function shuffle_choices(question) {
 
-		for (var k = 0; k < 3; k++) {
-			var k1 = (Math.random() * 4) | 0;
-			var k2 = (Math.random() * 4) | 0;
+		// equi distribution
+		var num = [];
+		for(var k=0;k<questions.length;k++)
+			num[k] = (k%4)+1;
+
+
+		// shuffle
+		for(var k=0;k<2*questions.length;k++) {
+			var k1 = (Math.random() * questions.length) | 0;
+			var k2 = (Math.random() * questions.length) | 0;
+			var temp = num[k1];
+			num[k1] = num[k2];
+			num[k2] = temp;
+		}
+
+
+		for(var k=0;k<questions.length;k++) {
+			var question = questions[k];
+			if(question.answer==num[k]) continue;
+
+			var k1 = num[k]-1;
+			var k2 = question.answer-1;
+
 			var temp = question.choices[k1];
 			question.choices[k1] = question.choices[k2];
 			question.choices[k2] = temp;
-			if (question.answer == k1 + 1) question.answer = k2 + 1;
-			else if (question.answer == k2 + 1) question.answer = k1 + 1;
+
+			question.answer = num[k];
 		}
 
 	}
