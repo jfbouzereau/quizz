@@ -242,6 +242,7 @@
 			font-family:myfont;
 			font-size:6vh;
 			color:#AAA;
+			cursor:pointer;
 		}
 
 		.setup input ~ .checkmark:after {
@@ -350,6 +351,11 @@
 				<button class="plus">+</button>
 			</div>
 			<div>
+				<input type="checkbox" name="rcolor" id="rcolor"/>
+				<span class="checkmark"></span>
+				<label for="rcolor" class="noselect" ></label>
+			</div>
+			<div>
 				<input checked type="checkbox" name="showrep" id="showrep"/>
 				<span class="checkmark"></span>
 				<label for="showrep" class="noselect" ></label>
@@ -396,6 +402,8 @@
 <script src="zip.js"></script>
 <script src="i18n.js"></script>
 <script>
+	var COLORS = ["#FF8","#88F","#8F8","#F88"];
+
 	var delay = 15; // each question is proposed during 15 seconds
 
 	var canvas = document.querySelector("#chrono canvas");
@@ -518,9 +526,6 @@
 
 		var button = document.querySelector("#games .footer button");
 		button.innerText = i18n(I_SETUP);
-
-		console.log("SHOW GAMES");
-		console.log(JSON.stringify(games));
 
 		if(games)
 			f3();
@@ -686,6 +691,10 @@
 		document.querySelector("#r3").classList.add("zero");
 		document.querySelector("#r4").classList.add("zero");
 	
+		var rcolor = document.querySelector("#setup input#rcolor").checked;
+		if(rcolor)
+			shuffle_colors(question);
+
 		show_page("pageq");
 
 		send({ type: "question" });
@@ -730,6 +739,32 @@
 
 // ***************************************************************************
 
+function shuffle_colors(question) {
+
+	var colors = COLORS.slice();
+
+	for(var k=0;k<4;k++) {
+		var k1 = (Math.random()*colors.length)|0;
+		var k2 = (Math.random()*colors.length)|0;
+		var temp = colors[k1];
+		colors[k1] = colors[k2];
+		colors[k2] = temp;
+	}
+
+	if(colors[question.answer-1]!=COLORS[question.answer-1])  {
+		question.oldanswer = question.answer;
+		question.answer = COLORS.indexOf(colors[question.answer-1])+1;
+	}
+
+	document.querySelector("#r1").style.backgroundColor = colors[0];
+	document.querySelector("#r2").style.backgroundColor = colors[1];
+	document.querySelector("#r3").style.backgroundColor = colors[2];
+	document.querySelector("#r4").style.backgroundColor = colors[3];
+	
+}
+
+// ***************************************************************************
+
 	function finish_question() {
 
 		canreply = false;
@@ -737,8 +772,12 @@
 		var showrep = document.querySelector("#setup input#showrep").checked;
 
 		if(showrep) {
+
+			var question = questions[qindex];
+			var answer = question.oldanswer || question.answer;
+
 			for (var i = 1; i <= 4; i++)
-				if (i != questions[qindex].answer)
+				if (i != answer)
 					document.querySelector("#r" + i + " .mask").style.display = "block";
 
 			setTimeout(show_score, 4000);
@@ -1081,7 +1120,8 @@ function hide_qrcode() {
 function onsetup() {
 
 	document.querySelector("#setup .header span").innerText = i18n(I_SETUP);
-	document.querySelector("#setup .setup label").innerText = i18n(I_SHOW);
+	document.querySelector("#setup label[for='showrep']").innerText = i18n(I_SHOW);
+	document.querySelector("#setup label[for='rcolor']").innerText = i18n(I_COLOR);
 
 	show_delay();
 
