@@ -118,19 +118,21 @@ http://myaddress:8000/builder.html
 ```
 * Change the name of the game by clicking on the title and typing the new name.
 
-* To add a question, drop a picture on the right side, and supply four choices
+* To add a question, drop a picture on the right side, and supply four different choices
 on the left side, the correct answer being the first one. Then click the left arrow button. A thumbnail of the picture is added to the gallery.
 
 * To modify a question, click on the thumbnail in the gallery, modify the choices, then click the left arrow button.
 
 * To remove a question, click on the thumbnail in the gallery, then click on the cross button.
 
+* To scroll the gallery, use the left and right arrow from the keyboard.
+
 * To download the zip archive, click the down arrow button.
 
 ## ACKNOWLEDGEMENT
 
 When a local zip file in dropped onto the interface, the file in
-uncompressed with the help of the [zip.js](https://github.com/gildas-lormeau/zip.js) library by Gildas Lormeau.
+uncompressed with the help of the [zip.js](https://github.com/gildas-lormeau/zip.js) library by Gildas Lormeau. The builder generates a zip file with this same utility.
 
 The initial QRCode is displayed with David Shim's [QRCode.js](https://davidshimjs.github.io/qrcodejs/)
 	

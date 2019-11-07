@@ -51,8 +51,15 @@ body {
 	display:flex;
 }
 
-.train {
-	width:100%;
+.gallery {
+	position:absolute;
+	left:0px;
+	top:0px;
+	bottom:0px;
+	width:77vw;
+	display:flex;
+	flexwrap:nowrap;
+	overflow:hidden;
 }
 
 .content {
@@ -99,25 +106,23 @@ body {
 	top:76%;
 }
 
-.film {
-	width:100%;
-	background-color:red;
-	display:flex;
-}
-
 .buttons {
+	position:absolute;
 	display:flex;
 	justify-content:space-around;
 	align-items:center;
+	top:0px;
+	right:0px;
+	bottom:0px;
+	width:22vw;
 }
 
 .buttons button {
-	width:8vh;
-	height:8vh;
+	width:6vw;
+	height:6vw;
 	border-radius:10px;
 	font-size:6vh;
 	color:white;
-	margin:10px;
 	border:2px solid white;
 	background-color:#AAA;
 }
@@ -143,7 +148,7 @@ body {
 			</div>
 		</div>
 		<div class="footer">
-			<div class="train">
+			<div class="gallery">
 			</div>
 			<div class="buttons">
 				<button class="plus" title="Add/Replace">⬅︎</button>
@@ -166,11 +171,14 @@ var picture = document.querySelector(".picture");
 picture.addEventListener("dragover",ondrag);
 picture.addEventListener("drop",ondrop);
 
-document.querySelector(".train").addEventListener("click",ontrain);
+document.querySelector(".gallery").addEventListener("click",ongallery);
 
 document.querySelector("button.plus").addEventListener("click",onplus);
 document.querySelector("button.minus").addEventListener("click",onminus);
 document.querySelector("button.down").addEventListener("click",ondown);
+
+document.body.addEventListener("keydown",onkey);
+document.body.focus();
 
 //**************************************************************************
 
@@ -239,6 +247,13 @@ function onplus(event) {
 	if(!r3.value) return;
 	if(!r4.value) return;
 
+	if(r1.value==r2.value) return;
+	if(r1.value==r3.value) return;
+	if(r1.value==r4.value) return;
+	if(r2.value==r3.value) return;
+	if(r2.value==r4.value) return;
+	if(r3.value==r4.value) return;
+
 	question.choices = [r1.value,r2.value,r3.value,r4.value];
 
 	if(!question.editing)
@@ -246,7 +261,7 @@ function onplus(event) {
 	
 	delete question.editing;
 
-	update_train();
+	update_gallery();
 
 	clear();
 }
@@ -262,7 +277,7 @@ function onminus(event) {
 
 	questions.splice(index,1);
 
-	update_train();
+	update_gallery();
 
 	clear();
 }
@@ -325,30 +340,30 @@ function ondown(event) {
 
 //**************************************************************************
 
-function update_train() {
+function update_gallery() {
 
-	var train = document.querySelector(".train");
+	var gallery = document.querySelector(".gallery");
 
-	var rect = train.getBoundingClientRect();
+	var rect = gallery.getBoundingClientRect();
 
-	train.innerHTML = "";
+	gallery.innerHTML = "";
 
 	for(var i=0;i<questions.length;i++) {
 		var img = document.createElement("img");
 		img.src = questions[i].image.src;
 		img.height = rect.height;
 		img.dataset.index = i;
-		train.appendChild(img);
+		gallery.appendChild(img);
 		var space = document.createElement("span");
 		space.innerHTML = "&nbsp;"
-		train.appendChild(space);
+		gallery.appendChild(space);
 	}
 
 }
 
 //**************************************************************************
 
-function ontrain(event) {
+function ongallery(event) {
 
 	var target = event.target;
 	if(target.tagName!="IMG") return;
@@ -403,6 +418,26 @@ function clear() {
 	r2.value = "";
 	r3.value = "";
 	r4.value = "";
+
+}
+
+//**************************************************************************
+
+function onkey(event) {
+	if(event.keyCode==39) {
+		var gallery = document.querySelector(".gallery");
+		var left = parseInt(gallery.style.left) | 0;
+		left -=50;
+		gallery.style.left = left+"px";
+
+	}
+	else if(event.keyCode==37) {
+		var gallery = document.querySelector(".gallery");
+		var left = parseInt(gallery.style.left) | 0;
+		left +=50;
+		if(left>0) left = 0;
+		gallery.style.left = left+"px";
+	}
 
 }
 
