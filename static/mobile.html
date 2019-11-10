@@ -8,7 +8,7 @@
   font-family: myfont;
   font-style: normal;
   font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/josefinslab/v10/lW-5wjwOK3Ps5GSJlNNkMalnqg6q.ttf);
+  src: url(josefinslab.ttf);
 }
 body {
 	margin:0px;
@@ -186,7 +186,7 @@ function ondown(event) {
 	var target = event.target;
 	var m = target.id.match(/^r([1-4])$/);
 	if(m)
-		timer = setTimeout(validate,500);
+		timer = setTimeout(validate,300);
 
 	function validate() {
 		timer = null;
@@ -215,7 +215,6 @@ function onup(event) {
 	if(timer) { clearTimeout(timer) ; timer = null; }
 	if(!answer) return;
 	var target = event.target;
-	console.log("ONUP answer="+answer+" TARGETID="+target.id);
 	var m = target.id.match(/^r([1-4])$/);
 	if(m && (m[1]==answer)) {
 			document.querySelector("#r"+answer).classList.remove("pressed");

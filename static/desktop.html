@@ -8,7 +8,7 @@
 			font-family: myfont;
 			font-style: normal;
 			font-weight: 400;
-			src: url(https://fonts.gstatic.com/s/josefinslab/v10/lW-5wjwOK3Ps5GSJlNNkMalnqg6q.ttf);
+			src: url(josefinslab.ttf);
 		}
 
 		body {
@@ -309,6 +309,32 @@
 		#area {
 			position:absolute;
 		}
+
+		#loading .progress {
+			position:absolute;
+			width:100%;
+			background-color:white;
+			top:12vh;	
+			bottom:0px;
+			display:flex;
+			justify-content:center;
+			align-items:center;
+		}
+
+		#loading .progress .meter {
+			width:50vw;
+			height:100px;
+			background-color:#EEE;
+		}
+
+		#loading .progress .meter .bar {
+			position:relative;
+			width:0;
+			height:100%;
+			background-color:#AAA;
+		}
+			
+		
 	</style>
 </head>
 
@@ -337,6 +363,17 @@
 		</table>
 		<div class="footer">
 			<button></button>
+		</div>
+	</div>
+
+	<div class="page" id="loading">
+		<div class="header">
+			<span></span>
+		</div>
+		<div class="progress">
+			<div class="meter">
+				<div class="bar"></div>
+			</div>
 		</div>
 	</div>
 
@@ -574,7 +611,6 @@
 
 		questions = game.questions;
 
-		show_page("NUL");
 
 		qindex = -1;
 
@@ -606,6 +642,10 @@
 
 	function default_preloader() {
 
+	document.querySelector("#loading .header span").innerText = i18n(I_LOAD);
+	show_page("loading");
+	show_bar(0);
+
 	images = [];
 	var nimg = 0;
 
@@ -622,10 +662,18 @@
 
 	function onload() {
 		nimg ++;
-		if(nimg==questions.length)
+		show_bar(nimg/questions.length);
+		if(nimg==questions.length) 
 			show_question(0);		
 		}
 
+	}
+
+// ***************************************************************************
+
+	function show_bar(pct) {
+		var bar = document.querySelector("#loading .progress .meter .bar");
+		bar.style.width = ((pct*100)|0)+"%";
 	}
 
 // ***************************************************************************
@@ -806,7 +854,11 @@ function shuffle_colors(question) {
 			};
 			send(msg);
 		}
-		setTimeout(next_question, 4000);
+
+		if(users.length==0)
+			setTimeout(next_question,10);
+		else
+			setTimeout(next_question, 4000);
 
 	}
 
