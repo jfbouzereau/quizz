@@ -12,6 +12,7 @@ var I_SHOW = "Montrer les réponses";			// show the answers
 var I_SETUP = "Réglages";						// setup
 var I_DELAY = "% secondes";						//
 var I_COLOR = "Mélanger les couleurs";			// shuffle the colors
+var I_LOAD = "Chargement...";					// loading
 
 function i18n(msg,param) {
 	return msg.replace(/[%]/,param);

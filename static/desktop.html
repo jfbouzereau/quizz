@@ -125,6 +125,8 @@
 			width: 100%;
 			left: 0px;
 			bottom:12vh;
+			table-layout:fixed;
+			white-space:nowrap;			
 		}
 
 		.users thead {
@@ -141,6 +143,16 @@
 			font-family: myfont;
 			text-align: left;
 			height:10vh;
+		}
+
+		.users tr td .name {
+			overflow:hidden;
+			white-space:nowrap;
+			width:44vw;
+		}
+
+		.users tr td.total {
+			text-align:right;
 		}
 
 		.games {
@@ -393,7 +405,7 @@
 				<label for="rcolor" class="noselect" ></label>
 			</div>
 			<div>
-				<input checked type="checkbox" name="showrep" id="showrep"/>
+				<input type="checkbox" name="showrep" id="showrep"/>
 				<span class="checkmark"></span>
 				<label for="showrep" class="noselect" ></label>
 			</div>
@@ -523,7 +535,7 @@
 				if(qindex>=0) break;
 
 				var now = new Date().getTime();
-				users.push({ name:msg.value, pid:msg.pid, score:0 , time:now });
+				users.push({ name:msg.value, pid:msg.pid, score:0 , detail:"",time:now });
 				display_users("welcome","time");
 				send({
 					type: "status",
@@ -539,8 +551,13 @@
 				var user = get_user(msg);
 				if (!user) break;
 				user.rep = msg.value;
-				if (msg.value == questions[qindex].answer)
+				if (msg.value == questions[qindex].answer) {
 					user.score++;
+					user.detail += "1";
+				}
+				else
+					user.detail += "0";
+
 				send({
 					type: "status",
 					pid: msg.pid,
@@ -843,8 +860,15 @@ function shuffle_colors(question) {
 		display_users("score","score");
 		show_page("score");
 
+		document.querySelector("#r1").classList.add("zero");
+		document.querySelector("#r2").classList.add("zero");
+		document.querySelector("#r3").classList.add("zero");
+		document.querySelector("#r4").classList.add("zero");
+	
 		for (var i = 0; i < users.length; i++) {
 			var user = users[i];
+			if(!user.rep)
+				user.detail += "-";
 			var msg = {
 				type: "status",
 				pid: user.pid,
@@ -962,7 +986,7 @@ function shuffle_colors(question) {
 	// sort users by decreasing key value
 		users.sort( function(ua,ub) { return ub[key]-ua[key] });
 
-		var w = window.innerWidth/2;
+		var w = (window.innerWidth*48/100)|0;
 		var h = (window.innerHeight*10/100)|0;
 
 		var table = document.querySelector("#" + page + " .users");
@@ -973,9 +997,15 @@ function shuffle_colors(question) {
 			else
 				var post = "";
 
+			if(!questions)
+				var total = "&nbsp;";
+			else
+				var total = (qindex==questions.length-1) ? users[i].score : "";
+
 			s += "<tr>";
-			s += "<td><canvas width='" + w + "' height='" + h + "'></td>";
-			s += "<td>" + users[i].name + " &nbsp; "+post+"</td>";
+			s += "<td width='50%'><canvas width='"+w+"' height='"+h+"'/></td>";
+			s += "<td width='45%'><div class='name'>" + users[i].name + " &nbsp; "+post+"</div></td>";
+			s += "<td width='10%' class='total'>"+total+"</td>";
 			s += "</tr>"
 		}
 		table.innerHTML = s;
@@ -988,7 +1018,11 @@ function shuffle_colors(question) {
 		var c = document.querySelectorAll("#" + page + " .users canvas");
 		for (var i = 0; i < users.length; i++) {
 
+			var canvas = c[i];
+			canvas.width = w;
+			canvas.height = h;
 			var ctx = c[i].getContext("2d");
+
 			ctx.fillStyle = "white";
 			ctx.fillRect(0, 0, w, h);
 
@@ -1005,9 +1039,10 @@ function shuffle_colors(question) {
 			}
 
 			ctx.fillStyle = "#0C0";
-			for (var j = 0; j < users[i].score; j++) {
+			for (var j = 0; j < qindex+1; j++) {
 				var x = dx * j;
-				ctx.fillRect(dx * j, 0, dx - 5, h);
+				if(users[i].detail[j]=="1")
+					ctx.fillRect(dx * j, 0, dx - 5, h);
 			}
 		}
 
