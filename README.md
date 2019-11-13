@@ -129,6 +129,8 @@ on the left side, the correct answer being the first one. Then click the left ar
 
 * To download the zip archive, click the down arrow button.
 
+You can try the builder online [here](http://lerallyemobile.fr:8000/builder.html)
+
 ## ACKNOWLEDGEMENT
 
 When a local zip file in dropped onto the interface, the file in
