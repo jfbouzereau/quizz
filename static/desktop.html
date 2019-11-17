@@ -66,19 +66,18 @@
 			font-family: myfont;
 			font-size: 36px;
 			color: #333;
-			line-height: 78px;
 			overflow:hidden;
 		}
 
 		#choices .rect span {
-			font-size:5vw;
+			font-size:4.5vw;
 			position:absolute;
 			left:50%;
 			top:54%;
 			width:100%;
 			transform: translate(-50%,-50%);
 			transition: font-size 0.5s;
-			overflow-x:hidden;
+			overflow:hidden;
 		}
 
 		#choices .rect.zero span {
@@ -192,7 +191,7 @@
 		.header span {
 			text-align: center;
 			font-family: myfont;
-			font-size: 9vh;
+			font-size: 6vw;
 			letter-spacing: 2px;
 		}
 
@@ -517,33 +516,58 @@
 
 		switch (msg.type) {
 			case "gid":
+				// game id sent by the server
 				gid = msg.value;
 				var banner = document.querySelector("#welcome .header span");
-				banner.innerText = location.href+gid;
+				banner.innerText = location.href.replace(/[?].*/,"")+gid;
 				break;
 				
 			case "mobile":
-				// no new player when game is started
-				if(qindex>=0) break;
-
 				var prompt = i18n(I_TEAM);
 				send({ type: "welcome", pid: msg.pid, prompt: prompt });
 				break;
 
 			case "user":
 				// no new player when game is started
-				if(qindex>=0) break;
+				//if(qindex>=0) break;
 
+				// look whether user already registered
+				var found = -1;
+				for(var i=0;i<users.length;i++) {
+					if(users[i].name==msg.value)
+						found = i;
+				}
+				
 				var now = new Date().getTime();
-				users.push({ name:msg.value, pid:msg.pid, score:0 , detail:"",time:now });
-				display_users("welcome","time");
-				send({
-					type: "status",
-					pid: msg.pid,
-					line1: i18n(I_WELCOME, msg.value),
-					line2: "",
-					line3: i18n(I_WAIT, 1)
-				});
+				if(found>=0) {
+					// replace
+					users[found].pid=msg.pid;
+					users[found].time = now;
+				}
+				else {
+					users.push({ name:msg.value, pid:msg.pid, score:0 , detail:"",time:now });
+				}
+
+				if(qindex<0) {
+					// game not started yet§
+					display_users("welcome","time");
+					send({
+						type: "status",
+						pid: msg.pid,
+						line1: i18n(I_WELCOME, msg.value),
+						line2: "",
+						line3: i18n(I_WAIT, 1)
+					});
+				} 
+				else {
+					send({
+						type:"status",
+						pid:msg.pid,
+						line1:i18n(I_WELCOME,msg.value),
+						line2:"",
+						line3: i18n(I_WAIT,qindex+1)
+					});
+				}
 				break;
 
 			case "answer":
@@ -697,7 +721,7 @@
 
 	function shuffle_choices(question) {
 
-		// equi distribution
+		// equi distribution of answers
 		var num = [];
 		for(var k=0;k<questions.length;k++)
 			num[k] = (k%4)+1;
@@ -715,8 +739,11 @@
 
 		for(var k=0;k<questions.length;k++) {
 			var question = questions[k];
+
+			// if answer is at the right place
 			if(question.answer==num[k]) continue;
 
+			// swap with num[k];
 			var k1 = num[k]-1;
 			var k2 = question.answer-1;
 
@@ -760,16 +787,20 @@
 		if(rcolor)
 			shuffle_colors(question);
 
-		show_page("pageq");
 
 		send({ type: "question" });
 
-		setTimeout(f1,  500);
-		setTimeout(f2, 1000);
-		setTimeout(f3, 1500);
-		setTimeout(f4, 2000);
-		setTimeout(f5, 2500);
-		setTimeout(f6, 3000);
+		setTimeout(f0,  500);
+		setTimeout(f1, 1000);
+		setTimeout(f2, 1500);
+		setTimeout(f3, 2000);
+		setTimeout(f4, 2500);
+		setTimeout(f5, 3000);
+		setTimeout(f6, 3500);
+
+		function f0() {
+			show_page("pageq");
+		}
 
 		function f1() {
 			var el1 = document.querySelector("#question");

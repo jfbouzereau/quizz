@@ -14,6 +14,9 @@ body {
 	margin:0px;
 	overscroll-behavior:none;
 }
+.prompt {
+	color:#AAA;
+}
 .button {
 	position:fixed;
 	width:50%;
@@ -49,6 +52,24 @@ body {
 	top:50%;
 	left:50%;
 	background-color:#F88;
+}
+
+#choice div {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+}
+
+#status div {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
 }
 
 .c1 { vertical-align:-10px; font-size:48px; color:#FF8; }
@@ -171,14 +192,14 @@ var timer = null;
 
 var answer = 0;
 
-document.querySelector("#choice").addEventListener("mousedown",ondown);
-document.querySelector("#choice").addEventListener("touchstart",ondown);
-/*
-document.querySelector("#choice").addEventListener("mousemove",onmove);
-document.querySelector("#choice").addEventListener("touchmove",onmove);
-*/
-document.querySelector("#choice").addEventListener("mouseup",onup);
-document.querySelector("#choice").addEventListener("touchend",onup);
+if(window.TouchEvent) {
+	document.querySelector("#choice").addEventListener("touchstart",ondown);
+	document.querySelector("#choice").addEventListener("touchend",onup);
+}
+else {
+	document.querySelector("#choice").addEventListener("mousedown",ondown);
+	document.querySelector("#choice").addEventListener("mouseup",onup);
+}
 
 
 function ondown(event) {		
@@ -186,46 +207,19 @@ function ondown(event) {
 	var target = event.target;
 	var m = target.id.match(/^r([1-4])$/);
 	if(m)
-		timer = setTimeout(validate,300);
+		timer = setTimeout(validate,200);
 
 	function validate() {
 		timer = null;
 		try { navigator.vibrate(100); } catch(err) {}
 		answer = m[1];
 		target.classList.add("pressed");
+		send({type:"answer",value:m[1]});
 	}
-
 }
-
-/*
-function onmove(event) {
-	if(!answer) return;
-	var target = event.target;
-	var m = target.id.match(/^r([1-4])$/);
-	if(m) {
-		if(m[1]==answer) 
-			document.querySelector("#r"+answer).classList.add("pressed");
-		else
-			document.querySelector("#r"+answer).classList.remove("pressed");
-	}	
-}
-*/
 
 function onup(event) {
 	if(timer) { clearTimeout(timer) ; timer = null; }
-	if(!answer) return;
-	var target = event.target;
-	var m = target.id.match(/^r([1-4])$/);
-	if(m && (m[1]==answer)) {
-			document.querySelector("#r"+answer).classList.remove("pressed");
-			answer += 100;
-			send({type:"answer",value:m[1]});
-		}
-	else {
-		document.querySelector("#r"+answer).classList.remove("pressed");
-		answer = null;
-	}
-
 }
 
 function onchange() {
