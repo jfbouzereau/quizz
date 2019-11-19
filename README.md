@@ -21,7 +21,7 @@ dependencies (so far only express and ws are required).
 
 By default the server listens to port 8000. This can be changed 
 in `server.js` (version with websockets) or `server2.js`
-(version withou websockets).
+(version without websockets).
 
 The interface is currently in french. The file `static/i18n.js`
 can be customized and adapted to your language.
@@ -85,7 +85,7 @@ node server.js		( version with websockets )
 ```
 or
 ```
-node server2.js		( version without websockets 
+node server2.js		( version without websockets )
 ```
 
 
