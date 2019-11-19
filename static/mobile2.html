@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@font-face {
+  font-family: myfont;
+  font-style: normal;
+  font-weight: 400;
+  src: url(josefinslab.ttf);
+}
+body {
+	margin:0px;
+	overscroll-behavior:none;
+}
+.prompt {
+	color:#AAA;
+}
+.button {
+	position:fixed;
+	width:50%;
+	height:50%;
+}
+.button.pressed {
+	background-color:black !important;
+}
+.page {
+	display:none;
+	position:fixed;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+}
+#r1 {
+	top:0px;
+	left:0px;
+	background-color:#FF8;
+}
+#r2 {
+	top:50%;
+	left:0px;
+	background-color:#88F;
+}
+#r3 {
+	top:0px;
+	left:50%;
+	background-color:#8F8;
+}
+#r4 {
+	top:50%;
+	left:50%;
+	background-color:#F88;
+}
+
+#choice div {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+}
+
+#status div {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+}
+
+.c1 { vertical-align:-10px; font-size:48px; color:#FF8; }
+.c2 { vertical-align:-10px; font-size:48px; color:#88F; }
+.c3 { vertical-align:-10px; font-size:48px; color:#8F8; }
+.c4 { vertical-align:-10px; font-size:48px; color:#F88; }
+
+.part {	
+	position:fixed;
+	left:0px;
+	width:100%;
+	height:33%;
+	text-align:center;
+	display:flex;
+}
+
+#one {
+	top:0px;
+}
+
+#two {
+	top:33%;
+	}
+
+#three {
+	top:66%;
+	}
+
+.part .content {
+	font-family:myfont;
+	margin:auto;
+	font-size:24px;
+}
+
+
+#welcome .content {
+	position:fixed;
+	top:20%;
+	left:10px;
+	right:15px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	padding:5px;
+}
+
+#welcome .content .prompt {
+	font-family:myfont;
+	font-size:28px;
+	font-style:italic;
+}
+
+#welcome .content input {
+	font-family:myfont;
+	font-size:28px;
+	width:100%;	
+	outline:none;
+	border:none;
+	border-bottom:1px solid black;
+}
+
+#welcome button {
+	font-size:28px;
+	border-radius:5px;
+	background-color:#999;
+	border:none;
+	width:200px;
+	color:white;
+}
+
+#welcome button:active {
+	background-color:#EEE;
+	color:#999;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page" id="welcome">
+	<div class="content">
+		<div class="prompt">...</div>
+		<br>
+		<input type="text" id="user" />
+		<br>
+		<button type="submit">OK</button>
+	</div>
+</div>
+
+<div class="page" id="choice">
+	<div class="button" id="r1"></div> 
+	<div class="button" id="r2"></div> 
+	<div class="button" id="r3"></div> 
+	<div class="button" id="r4"></div> 
+</div>
+
+<div class="page" id="status">
+	<div id="one" class="part"><div class="content"></div></div>
+	<div id="two" class="part"><div class="content"></div></div>
+	<div id="three" class="part"><div class="content"></div></div>
+</div>
+</body>
+<script>
+var logged = false;
+var COLORS = ["#FF8","#88F","#8F8","#F88"];
+
+var input = document.querySelector("input#user");
+input.addEventListener("change",onchange);
+document.querySelector("#welcome button").addEventListener("click",onchange);
+
+var user = localStorage.getItem("quizz/user");
+
+
+var timer = null;
+
+var answer = 0;
+
+if(window.TouchEvent) {
+	document.querySelector("#choice").addEventListener("touchstart",ondown);
+	document.querySelector("#choice").addEventListener("touchend",onup);
+}
+else {
+	document.querySelector("#choice").addEventListener("mousedown",ondown);
+	document.querySelector("#choice").addEventListener("mouseup",onup);
+}
+
+var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
+var pid = 0;
+
+send({type:"mobile",gid:gid});
+
+//****************************************************************************
+
+function ondown(event) { 
+	event.preventDefault();
+	if(answer) return;
+	var target = event.target;
+	var m = target.id.match(/^r([1-4])$/);
+	if(m)
+		timer = setTimeout(validate,200);
+
+	function validate() {
+		timer = null;
+		try { navigator.vibrate(100); } catch(err) {}
+		answer = m[1];
+		target.classList.add("pressed");
+		send({type:"answer",value:m[1],gid:gid,pid:pid});
+	}
+}
+
+function onup(event) {
+	event.preventDefault();
+	if(timer) { clearTimeout(timer) ; timer = null; }
+}
+
+function onchange() {
+	if(logged) return;
+	logged = true;
+	user = input.value;
+	if(!user) return;
+	localStorage.setItem("quizz/user",user);
+	send({type:"user",value:user,gid:gid,pid:pid});
+}
+
+
+//****************************************************************************
+
+function clear() {
+	var els = document.querySelectorAll(".pressed");
+	for(var i=0;i<els.length;i++)
+		els[i].classList.remove("pressed");
+}
+
+function show_page(name) {
+	var pages = document.querySelectorAll(".page");
+	for(var i=0;i<pages.length;i++)
+		pages[i].style.display = "none";
+	var page = document.querySelector(".page#"+name);	
+	page.style.display = "block";
+}
+
+function show_status(line1,line2,line3) {
+	document.querySelector("#one .content").innerHTML = line1;
+	document.querySelector("#two .content").innerHTML = line2;
+	document.querySelector("#three .content").innerHTML = line3;
+	show_page("status");
+}
+
+//****************************************************************************
+
+function send(msg) {
+
+    console.log("SENDING "+JSON.stringify(msg));
+
+    var options = {};
+    options.headers = {"Accept":"application/json","Content-Type":"application/json"};
+    options.method = "POST";
+    options.body = JSON.stringify(msg);
+
+    fetch("/msg",options)
+        .then( function(res) { return res.json() }  )
+        .then(onmessage)
+        .catch( function(err) { console.log(err) });
+}
+
+//****************************************************************************
+
+function poll() {
+
+    console.log("POLLING WITH GID="+gid+" PID="+pid);
+
+    var options = {};
+    options.headers = {"Accept":"application/json","Content-Type":"application/json"};
+
+    fetch("/_mobile_/"+gid+"/"+pid,options)
+        .then( function(res) { return res.json() }  )
+        .then( function(msg) {onmessage(msg); poll() })
+        .catch( function(err) { console.log(err) });
+
+}
+
+//****************************************************************************
+
+function onmessage(msg) {
+
+	console.log("MESSAGE "+JSON.stringify(msg));
+
+	switch(msg.type) {
+		case "pid":
+			pid = msg.value;
+			poll();
+			break;
+
+		case "welcome":	
+			document.querySelector("#welcome .prompt").innerText = msg.prompt;
+			input.value = user || "";
+			show_page("welcome");
+			break;
+
+		case "question" :		
+			clear();
+			show_page("choice");
+			answer = 0;
+			break;
+
+		case "status":
+			show_status(msg.line1,msg.line2,msg.line3);
+			break;			
+
+		case "close":
+			window.close();
+			break;
+        }
+
+}
+
+
+//****************************************************************************
+
+</script>
+</html>
