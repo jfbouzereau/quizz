@@ -424,21 +424,22 @@ function clear() {
 //**************************************************************************
 
 function onkey(event) {
+	var gallery = document.querySelector(".gallery");
 	if(event.keyCode==39) {
-		var gallery = document.querySelector(".gallery");
 		var left = parseInt(gallery.style.left) | 0;
 		left -=50;
 		gallery.style.left = left+"px";
-
 	}
 	else if(event.keyCode==37) {
-		var gallery = document.querySelector(".gallery");
 		var left = parseInt(gallery.style.left) | 0;
 		left +=50;
 		if(left>0) left = 0;
 		gallery.style.left = left+"px";
 	}
 
+	var width = ((window.innerWidth*77/100)|0)-parseInt(gallery.style.left);
+	console.log("SETTING GALLERY WIDTH "+width);
+	gallery.style.width = width+"px";
 }
 
 //**************************************************************************
