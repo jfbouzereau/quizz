@@ -199,7 +199,10 @@ else {
 var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
 var pid = 0;
 
-send({type:"mobile",gid:gid});
+if(window.fetch)
+	send({type:"mobile",gid:gid});
+else
+	alert("Impossible de lancer le jeu sur cet appareil")
 
 //****************************************************************************
 

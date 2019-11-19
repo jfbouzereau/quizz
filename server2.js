@@ -22,10 +22,10 @@ app.use(bodyParser.json());
 
 //app.use(reqlog);
 
-// normal start of desktop
+// normal start for desktop
 app.get("/",init);
 
-// normal start of mobile with game id
+// normal start for mobile with game id
 app.get("/:gid([a-z][a-z][a-z])", init);
 
 app.get("/_desktop_/:gid",ondesktop);		// desktop polling
@@ -40,7 +40,7 @@ app.get("/:dir/:filename", function(req,res) {
 	res.sendFile(req.params.dir+"/"+req.params.filename,{root:"static"});
 });
 
-app.post("/msg", onmessage);
+app.post("/msg", onmessage);				// message channel
 
 log("Listening on port "+port);
 server.listen(port);
@@ -80,7 +80,7 @@ function ondesktop(req,res) {
 
 	var gid = req.params.gid;
 
-	log("DESKTOP POLLING GID "+gid);
+	//log("DESKTOP POLLING GID "+gid);
 
 	if(desktopmsg[gid]&&(desktopmsg[gid].length>0)) {
 		var msg = desktopmsg[gid].shift();
@@ -105,7 +105,7 @@ function onmobile(req,res) {
 	var pid = req.params.pid;
 	var key = gid+"/"+pid;
 
-	log("MOBILE POLLING KEY "+key);
+	//log("MOBILE POLLING KEY "+key);
 
 	if(mobilemsg[key]&&(mobilemsg[key].length>0)) {
 		var msg = mobilemsg[key].shift();
@@ -128,7 +128,7 @@ function send_desktop(msg) {
 
 	var gid = msg.gid;
 
-	log("SEND TO DESKTOP GID "+gid+" "+JSON.stringify(msg));
+	//log("SEND TO DESKTOP GID "+gid+" "+JSON.stringify(msg));
 
 	if(desktopres[gid]&&(desktopres[gid].length>0)) {
 		log("    FOUND RES");
@@ -152,7 +152,7 @@ function send_mobile(msg) {
 	var pid = msg.pid;
 	var key = gid+"/"+pid;
 
-	log("SEND TO MOBILE "+key+" "+JSON.stringify(msg));
+	//log("SEND TO MOBILE "+key+" "+JSON.stringify(msg));
 
 	if(mobileres[key]&&(mobileres[key].length>0)) {
 		log("    FOUND RES");
@@ -172,16 +172,18 @@ function send_mobile(msg) {
 
 function broadcast_mobile(msg) {
 
-	log("BROADCAST "+JSON.stringify(msg));
+	//log("BROADCAST "+JSON.stringify(msg));
 
 	var gid = msg.gid;
 
+	// list of player ids
 	var pids = msg.pids;
 	delete msg.pids;
 
 	for(var i=0;i<pids.length;i++) {
-		msg.pid = pids[i];
-		send_mobile(msg);
+		var msg2 = Object.assign({},msg);	// clone
+		msg2.pid = pids[i];
+		send_mobile(msg2);
 	}
 
 }
@@ -197,7 +199,7 @@ function onmessage(req,res) {
 	switch(msg.type) {
 		case "desktop":
 			var gid = random_gid();	// game id
-			res.send({type:"gid",value:gid});
+			res.json({type:"gid",value:gid});
 			break;
 
 		case "mobile":
