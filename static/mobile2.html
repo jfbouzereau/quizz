@@ -195,13 +195,22 @@ else {
 	document.querySelector("#choice").addEventListener("mouseup",onup);
 }
 
+// game id
 var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
+
+// player id
 var pid = 0;
 
-if(window.fetch)
-	send({type:"mobile",gid:gid});
-else
-	alert("Impossible de lancer le jeu sur cet appareil")
+if(window.fetch) {
+	var send = sendfetch;
+	var poll = pollfetch;
+}
+else {
+	var send = sendxhr;
+	var poll = pollxhr;
+}
+
+send({type:"mobile",gid:gid});
 
 //****************************************************************************
 
@@ -225,6 +234,7 @@ function ondown(event) {
 function onup(event) {
 	event.preventDefault();
 	if(timer) { clearTimeout(timer) ; timer = null; }
+	clear();
 }
 
 function onchange() {
@@ -262,9 +272,7 @@ function show_status(line1,line2,line3) {
 
 //****************************************************************************
 
-function send(msg) {
-
-    console.log("SENDING "+JSON.stringify(msg));
+function sendfetch(msg) {
 
     var options = {};
     options.headers = {"Accept":"application/json","Content-Type":"application/json"};
@@ -279,9 +287,23 @@ function send(msg) {
 
 //****************************************************************************
 
-function poll() {
+function sendxhr(msg) {
 
-    console.log("POLLING WITH GID="+gid+" PID="+pid);
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("POST","/msg");
+    xhr.setRequestHeader("Content-Type","application/json");
+    xhr.responseType = "json";
+    xhr.send(JSON.stringify(msg));
+    xhr.onload = function() {
+        onmessage(xhr.response);
+    }
+
+}
+
+//****************************************************************************
+
+function pollfetch() {
 
     var options = {};
     options.headers = {"Accept":"application/json","Content-Type":"application/json"};
@@ -290,6 +312,23 @@ function poll() {
         .then( function(res) { return res.json() }  )
         .then( function(msg) {onmessage(msg); poll() })
         .catch( function(err) { console.log(err) });
+
+}
+
+//****************************************************************************
+
+function pollxhr() {
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET","/_mobile_/"+gid+"/"+pid);
+    xhr.setRequestHeader("Content-Type","application/json");
+    xhr.responseType = "json";
+    xhr.send();
+    xhr.onload = function() {
+        onmessage(xhr.response||{});
+        poll();
+    }
 
 }
 

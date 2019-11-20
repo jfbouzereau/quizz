@@ -705,6 +705,7 @@
 
 		function f0() {
 			show_page("pageq");
+			canreply = true;
 		}
 
 		function f1() {
@@ -732,7 +733,6 @@
 		}
 
 		function f6() {
-			canreply = true;
 			start_chrono();
 		}
 	}
@@ -1187,8 +1187,10 @@ function onmessage(msg) {
 			break;
 
 		case "answer":
+			console.log("    CANREPLY="+canreply);
 			if(!canreply) break;
 			var user = get_user(msg);
+			console.log("    USER="+user);
 			if (!user) break;
 			user.rep = msg.value;
 			if (msg.value == questions[qindex].answer) {
