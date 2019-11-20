@@ -207,7 +207,8 @@ function onmessage(req,res) {
 			var gid = msg.gid;
 			var pid = ++playerid;
 			res.json({type:"pid",value:pid});
-			send_desktop({type:"mobile",pid:pid,gid:gid});
+			msg.pid = pid;
+			send_desktop(msg);
 			break;
 
 		case "welcome":

@@ -182,7 +182,6 @@ document.querySelector("#welcome button").addEventListener("click",onchange);
 
 var user = localStorage.getItem("quizz/user");
 
-
 var timer = null;
 
 var answer = 0;
@@ -230,11 +229,11 @@ function onup(event) {
 
 function onchange() {
 	if(logged) return;
-	logged = true;
+	if(!input.value) return;
 	user = input.value;
-	if(!user) return;
+	logged = true;
 	localStorage.setItem("quizz/user",user);
-	send({type:"user",value:user,gid:gid,pid:pid});
+	send({type:"user",value:user,gid:gid,pid:pid,uuid:uuid()});
 }
 
 
@@ -329,6 +328,45 @@ function onmessage(msg) {
 
 }
 
+//****************************************************************************
+
+function uuid() {
+	var info = [];
+	info.push(navigator.appCodeName || "")
+	info.push(navigator.appName || "")
+	info.push(navigator.appVersion || "")
+	info.push(navigator.language || "")
+	info.push(navigator.platform || "")
+	info.push(navigator.product || "")
+	info.push(navigator.productStub || "")
+	info.push(navigator.userAgent || "")
+	info.push(navigator.vendor || "")
+	info.push(screen.availWidth+"")
+	info.push(screen.availHeight+"")
+	return hash(info.join(","))
+}
+
+// Polyfill of Math.imul
+function imul(a, b) {
+  var ah  = (a >>> 16) & 0xffff;		// a high
+  var al = a & 0xffff;					// a low
+  var bh  = (b >>> 16) & 0xffff;		// b high
+  var bl = b & 0xffff;					// b low
+  return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0)|0);
+};
+
+function hash(str,seed) {
+	seed = seed || 0;
+    var h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for (var i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = imul(h1 ^ ch, 2654435761);
+        h2 = imul(h2 ^ ch, 1597334677);
+    }
+    h1 = imul(h1^h1>>>16, 2246822507)^imul(h2 ^ h2>>>13, 3266489909);
+    h2 = imul(h2^h2>>>16, 2246822507)^imul(h1 ^ h1>>>13, 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1>>>0);
+};
 
 //****************************************************************************
 

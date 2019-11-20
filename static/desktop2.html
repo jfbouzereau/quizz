@@ -558,8 +558,10 @@
 
 		qindex = -1;
 
-		for(var i=0;i<users.length;i++)
+		for(var i=0;i<users.length;i++) {
 			users[i].score = 0;
+			users[i].detail = "";
+		}
 
 	// shuffle questions
 		for (var k = 0; k < questions.length; k++) {
@@ -802,7 +804,7 @@ function shuffle_colors(question) {
 	
 		for (var i = 0; i < users.length; i++) {
 			var user = users[i];
-			if(!user.rep)
+			while(user.detail.length<qindex+1)
 				user.detail += "-";
 			var msg = {
 				type: "status",
@@ -1145,18 +1147,19 @@ function onmessage(msg) {
 		case "user":
 			var found = -1;
 			for(var i=0;i<users.length;i++) {
-				if(users[i].name==msg.value)
+				if(users[i].uuid==msg.uuid)
 					found = i;
 			}
 			
 			var now = new Date().getTime();
 			if(found>=0) {
 				// replace
-				users[found].pid=msg.pid;
+				users[found].pid = msg.pid;
 				users[found].time = now;
+				users[found].name = msg.value;
 			}
 			else {
-				users.push({ name:msg.value, pid:msg.pid, score:0 , detail:"",time:now });
+				users.push({ name:msg.value, pid:msg.pid, score:0 , detail:"",time:now , uuid:msg.uuid});
 			}
 
 			if(qindex<0) {
@@ -1190,10 +1193,15 @@ function onmessage(msg) {
 			user.rep = msg.value;
 			if (msg.value == questions[qindex].answer) {
 				user.score++;
+				while(user.detail.length<qindex)
+					user.detail += "-";
 				user.detail += "1";
 			}
-			else
+			else {
+				while(user.detail.length<qindex)
+					user.detail += "-";
 				user.detail += "0";
+			}
 
 			send({
 				type: "status",
