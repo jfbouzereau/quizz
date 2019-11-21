@@ -47,7 +47,7 @@
 		}
 
 		#question img {
-			transition: height 0.5s;
+			/* transition: height 0.5s; */
 		}
 
 		#choices {
@@ -672,6 +672,8 @@
 
 		for (var i = 0; i < users.length; i++)
 			users[i].rep = null;
+			
+		document.querySelector("#question img").addEventListener("load",f0,{once:true});
 
 		document.querySelector("#question img").height = 0;
 		document.querySelector("#question img").src = images[index].src;
@@ -695,7 +697,7 @@
 
 		send({ type: "question",index:qindex+1,gid:gid ,pids:get_pids()});
 
-		setTimeout(f0,  500);
+		//setTimeout(f0,  500);
 		setTimeout(f1, 1000);
 		setTimeout(f2, 1500);
 		setTimeout(f3, 2000);
@@ -811,7 +813,7 @@ function shuffle_colors(question) {
 				gid:gid,
 				pid: user.pid,
 				line1: format_reply(user.rep),
-				line2: i18n(I_USCORE, user.score + " / " + questions.length),
+				line2: i18n(I_USCORE, user.score + " / " + (qindex+1)),
 				line3: (qindex + 1 >= questions.length) ? "" : i18n(I_WAIT, qindex + 2)
 			};
 			send(msg);
@@ -1110,17 +1112,19 @@ function send(msg){
 
 // ***************************************************************************
 
+var polling;
+
 function poll() {
 
-	console.log("POLLING WITH GID "+gid);
+	polling = 0;
 
 	var options = {};
 	options.headers = {"Accept":"application/json","Content-Type":"application/json"};
 
 	fetch("/_desktop_/"+gid,options)
 		.then( function(res) { return res.json() }	)
-		.then( function(msg) { onmessage(msg); poll() })
-		.catch( function(err) { console.log(err) });
+		.then( function(msg) { onmessage(msg); polling=1; poll() })
+		.catch( function(err) { console.log(err); if(polling!=1) setTimeout(poll,100); });
 	
 }
 

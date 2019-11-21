@@ -303,21 +303,28 @@ function sendxhr(msg) {
 
 //****************************************************************************
 
+var polling;
+
 function pollfetch() {
 
+	console.log("POLLING...");	
+	polling = 0;
+	
     var options = {};
     options.headers = {"Accept":"application/json","Content-Type":"application/json"};
 
     fetch("/_mobile_/"+gid+"/"+pid,options)
         .then( function(res) { return res.json() }  )
-        .then( function(msg) {onmessage(msg); poll() })
-        .catch( function(err) { console.log(err) });
+        .then( function(msg) { onmessage(msg); polling=1; poll() })
+        .catch( function(err) { console.log(err); if(polling!=1) setTimeout(poll,100); });
 
 }
 
 //****************************************************************************
 
 function pollxhr() {
+
+	polling = true;
 
     var xhr = new XMLHttpRequest();
 
@@ -326,9 +333,14 @@ function pollxhr() {
     xhr.responseType = "json";
     xhr.send();
     xhr.onload = function() {
+		polling = false;
         onmessage(xhr.response||{});
         poll();
     }
+	xhr.onerror = function(err) {
+		console.log(err);
+		if(!polling) poll();	
+	}
 
 }
 

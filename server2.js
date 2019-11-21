@@ -6,6 +6,7 @@ const port = 8000;
 
 var app = express();
 var server = http.createServer(app);
+server.setTimeout(120000);
 
 var desktopmsg = {}; 		// waiting messages for desktop
 var desktopres = {};		// waiting responses for desktop
@@ -42,11 +43,13 @@ app.get("/:dir/:filename", function(req,res) {
 
 app.post("/msg", onmessage);				// message channel
 
+app.use(onerror);
+
 log("Listening on port "+port);
 server.listen(port);
 
 cleanup();
-setInterval(cleanup,300000);
+setInterval(cleanup,120000);
 
 //********************************************************
 
@@ -59,9 +62,15 @@ function reqlog(req,res,next) {
 
 //********************************************************
 
+function onerror(err,req,res,next) {
+	console.log("ERR "+err);
+}
+
+//********************************************************
+
 function init(req,res) {
 
-	var ua = req.headers["user-agent"];	
+	var ua = req.headers["user-agent"] || "";
 	var mobile = !!ua.match(/(Android)|(iPhone)|(iPad)/);
 
 	if(req.url.indexOf("desktop")>=0)
@@ -92,7 +101,7 @@ function ondesktop(req,res) {
 		if(!desktopres[gid])
 			desktopres[gid] = [];
 		res.__time = Date.now();
-		desktopres[gid].push(res);
+		desktopres[gid][0] = res;
 	}
 
 }
@@ -117,7 +126,7 @@ function onmobile(req,res) {
 		if(!mobileres[key])
 			mobileres[key] = [];
 		res.__time = Date.now();
-		mobileres[key].push(res);
+		mobileres[key][0] = res;
 	}
 
 }
@@ -263,18 +272,25 @@ function cleanup() {
 	var limit = Date.now()-300000;	// 5 mns
 
 	for(var key in desktopres)
-		clean(desktopres[key]);
+		cleanres(desktopres[key]);
 	
 	for(var key in desktopmsg)
-		clean(desktopmsg[key]);
+		cleanmsg(desktopmsg[key]);
 
 	for(var key in mobileres)
-		clean(mobileres[key]);
+		cleanres(mobileres[key]);
 
 	for(var key in mobilemsg)
-		clean(mobilemsg[key]);
+		cleanmsg(mobilemsg[key]);
 
-	function clean(list) {	
+
+	function cleanres(list) {
+		if(list.length==0) return;
+		var res = list.shift();
+		try {res.json({}); } catch(err) {}
+	}
+
+	function cleanmsg(list) {	
 		for(var i=list.length-1;i>=0;i--)
 			if(list[i].__time<limit)
 				list.splice(i,1);
