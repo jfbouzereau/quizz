@@ -6,7 +6,7 @@ const port = 8000;
 
 var app = express();
 var server = http.createServer(app);
-server.setTimeout(120000);
+//server.setTimeout(120000);
 
 var desktopmsg = {}; 		// waiting messages for desktop
 var desktopres = {};		// waiting responses for desktop
@@ -49,13 +49,13 @@ log("Listening on port "+port);
 server.listen(port);
 
 cleanup();
-setInterval(cleanup,120000);
+setInterval(cleanup,60000);
 
 //********************************************************
 
 function reqlog(req,res,next) {
 	
-	log("REQ "+req.url);
+	console.log("REQ "+req.url);
 
 	next();
 }
@@ -114,15 +114,12 @@ function onmobile(req,res) {
 	var pid = req.params.pid;
 	var key = gid+"/"+pid;
 
-	//log("MOBILE POLLING KEY "+key);
-
 	if(mobilemsg[key]&&(mobilemsg[key].length>0)) {
 		var msg = mobilemsg[key].shift();
 		log("    FOUND MSG "+JSON.stringify(msg));
 		res.json(msg);
 	}
 	else {
-		log("    PUSHING RES "+key);
 		if(!mobileres[key])
 			mobileres[key] = [];
 		res.__time = Date.now();
@@ -221,28 +218,28 @@ function onmessage(req,res) {
 			break;
 
 		case "welcome":
-			res.json({});
+			res.status(200).json(dummy());
 			send_mobile(msg);
 			break;
 
 		case "user":
 			console.log(JSON.stringify(msg));
-			res.json({});
+			res.status(200).json(dummy());
 			send_desktop(msg);
 			break;
 
 		case "question":	
-			res.json({});
+			res.status(200).json(dummy());
 			broadcast_mobile(msg);
 			break;
 
 		case "answer":
-			res.json({});
+			res.status(200).json(dummy());
 			send_desktop(msg);
 			break;
 
 		case "status":
-			res.json({});
+			res.status(200).json(dummy());
 			send_mobile(msg);
 			break;
 		}
@@ -272,22 +269,22 @@ function cleanup() {
 	var limit = Date.now()-300000;	// 5 mns
 
 	for(var key in desktopres)
-		cleanres(desktopres[key]);
+		cleanres(desktopres[key],key);
 	
 	for(var key in desktopmsg)
 		cleanmsg(desktopmsg[key]);
 
 	for(var key in mobileres)
-		cleanres(mobileres[key]);
+		cleanres(mobileres[key],key);
 
 	for(var key in mobilemsg)
 		cleanmsg(mobilemsg[key]);
 
 
-	function cleanres(list) {
+	function cleanres(list,key) {
 		if(list.length==0) return;
 		var res = list.shift();
-		try {res.json({}); } catch(err) {}
+		try {res.status(200).json(dummy()); } catch(err) {}
 	}
 
 	function cleanmsg(list) {	
@@ -296,6 +293,12 @@ function cleanup() {
 				list.splice(i,1);
 	}
 
+}
+
+//********************************************************
+
+function dummy() {
+	return {type:"dummy",value:Math.random()}
 }
 
 //********************************************************
