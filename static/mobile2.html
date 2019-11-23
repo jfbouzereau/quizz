@@ -185,6 +185,7 @@ var user = localStorage.getItem("quizz/user");
 var timer = null;
 
 var answer = 0;
+var qindex = -1;
 
 if(window.TouchEvent) {
 	document.querySelector("#choice").addEventListener("touchstart",ondown);
@@ -227,7 +228,7 @@ function ondown(event) {
 		try { navigator.vibrate(100); } catch(err) {}
 		answer = m[1];
 		target.classList.add("pressed");
-		send({type:"answer",value:m[1],gid:gid,pid:pid});
+		send({type:"answer",value:m[1],index:qindex,gid:gid,pid:pid});
 	}
 }
 
@@ -307,7 +308,6 @@ var polling;
 
 function pollfetch() {
 
-	console.log("POLLING...");	
 	polling = 0;
 	
     var options = {};
@@ -315,31 +315,48 @@ function pollfetch() {
 
     fetch("/_mobile_/"+gid+"/"+pid,options)
         .then( function(res) { return res.json() }  )
-        .then( function(msg) { onmessage(msg); polling=1; poll() })
+        .then( function(msg) { onmessage(msg||{}); polling=1; poll() })
         .catch( function(err) { console.log(err); if(polling!=1) setTimeout(poll,100); });
 
 }
 
 //****************************************************************************
 
+var xhrid ;
+
 function pollxhr() {
 
-	polling = true;
+	xhrid = (xhrid||0)+1;
+
+	console.log("POLLING "+xhrid);
+	
+	polling = 0;
 
     var xhr = new XMLHttpRequest();
+	
+	xhr.__id = xhrid;
+	xhr.__time = (new Date()).getTime();
 
     xhr.open("GET","/_mobile_/"+gid+"/"+pid);
+	xhr.timeout = 150000;
     xhr.setRequestHeader("Content-Type","application/json");
     xhr.responseType = "json";
     xhr.send();
     xhr.onload = function() {
-		polling = false;
+		console.log("ONLOAD xhrid="+xhr.__id);
         onmessage(xhr.response||{});
+		polling = 1;
         poll();
     }
 	xhr.onerror = function(err) {
+		console.log("ONERR xhr.id="+xhr__id);
 		console.log(err);
-		if(!polling) poll();	
+		if(polling!=1) setTimeout(poll,100);
+	}
+	xhr.ontimeout = function() {
+		var t = (new Date()).getTime()-xhr.__time;
+		console.log("ONTIMEOUT xhrid="+xhr.__id+" after "+t);
+		if(polling!=1) setTimeout(poll,100);
 	}
 
 }
@@ -365,6 +382,7 @@ function onmessage(msg) {
 		case "question" :		
 			clear();
 			show_page("choice");
+			qindex = msg.index;
 			answer = 0;
 			break;
 
