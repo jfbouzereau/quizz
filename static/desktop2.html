@@ -469,6 +469,7 @@
 
 	var t1 = null;	// start of game
 
+	var gameoffset = 0;
 
 	var preload = default_preloader;
 	var images = [];		// preloaded images
@@ -497,9 +498,34 @@
 
 	document.querySelector("#setup .footer button").addEventListener("click",onsetupok);
 
+	document.body.addEventListener("keydown", onkeydown);
+	
+	document.body.focus();
+
 	show_page("welcome");
 
 	send({ type: "desktop"});
+
+// ***************************************************************************
+
+function onkeydown(event) {
+
+	var page = document.querySelector("#games.page");
+	if(page.style.display!="block") return;
+
+	if(event.keyCode==40) {
+		if(gameoffset<games.length-1)	
+			gameoffset += 1;
+		update_game_list();
+	}
+	else if(event.keyCode==38) {
+		if(gameoffset>0)
+			gameoffset -= 1;
+		update_game_list();
+	}
+	
+}
+
 
 // ***************************************************************************
 
@@ -521,16 +547,21 @@
 
 			var td = document.querySelector("#games .header span");
 			td.innerText = i18n(I_GAMES);
-	
-			var table = document.querySelector("#games table.games");
-			var s = "";
-			for(var i=0;i<games.length;i++) 
-				s += "<tr><td>"+games[i].name+"</td></tr>";
 
-			table.innerHTML = s;
+			update_game_list();	
 			show_page("games");
 		}
 
+	}
+
+// ***************************************************************************
+
+	function update_game_list() {
+		var table = document.querySelector("#games table.games");
+		var s = "";
+		for(var i=gameoffset;i<games.length;i++) 
+			s += "<tr><td>"+games[i].name+"</td></tr>";
+		table.innerHTML = s;
 	}
 
 // ***************************************************************************
@@ -674,9 +705,8 @@
 			users[i].rep = null;
 			
 		document.querySelector("#question img").addEventListener("load",f0,{once:true});
-
-		document.querySelector("#question img").height = 0;
 		document.querySelector("#question img").src = images[index].src;
+
 		document.querySelector("#r1 span").innerText = question.choices[0];
 		document.querySelector("#r2 span").innerText = question.choices[1];
 		document.querySelector("#r3 span").innerText = question.choices[2];
@@ -697,41 +727,48 @@
 
 		send({ type: "question",index:qindex+1,gid:gid ,pids:get_pids()});
 
-		//setTimeout(f0,  500);
-		setTimeout(f1, 1000);
-		setTimeout(f2, 1500);
-		setTimeout(f3, 2000);
-		setTimeout(f4, 2500);
-		setTimeout(f5, 3000);
-		setTimeout(f6, 3500);
-
 		function f0() {
 			show_page("pageq");
 			canreply = true;
+			setTimeout(f1,100);
 		}
 
 		function f1() {
 			var el1 = document.querySelector("#question");
 			var el2 = document.querySelector("#choices");
 			var h = el2.offsetTop - el1.offsetTop;
-			document.querySelector("#question img").height = h;
-			setTimeout(f2,500);
+
+			var img = document.querySelector("#question img");
+
+			if(img.naturalWidth==0) {
+				console.log("img w="+img.width+" h="+img.height+" nw="+
+					img.naturalWidth+" nh="+img.naturalHeight);
+				setTimeout(f1,100);
+			}
+			else {
+				img.height = h;
+				setTimeout(f2,500);
+				}
 			}
 
 		function f2() {
 			document.querySelector("#r1").classList.remove("zero");
+			setTimeout(f3,500);
 		}
 
 		function f3() {
 			document.querySelector("#r2").classList.remove("zero");
+			setTimeout(f4,500);
 		}
 
 		function f4() {
 			document.querySelector("#r3").classList.remove("zero");
+			setTimeout(f5,500);
 		}
 
 		function f5() {
 			document.querySelector("#r4").classList.remove("zero");
+			setTimeout(f6,500);
 		}
 
 		function f6() {
@@ -744,19 +781,18 @@
 
 function shuffle_colors(question) {
 
-	var colors = COLORS.slice();
+	var colors = [0,0,0,0];
 
-	for(var k=0;k<4;k++) {
-		var k1 = (Math.random()*colors.length)|0;
-		var k2 = (Math.random()*colors.length)|0;
-		var temp = colors[k1];
-		colors[k1] = colors[k2];
-		colors[k2] = temp;
-	}
-
-	if(colors[question.answer-1]!=COLORS[question.answer-1])  {
-		question.oldanswer = question.answer;
-		question.answer = COLORS.indexOf(colors[question.answer-1])+1;
+	var ran = (Math.random()*8)|0;
+	switch(ran) {
+		case 0: swap(1,2,3,0); break;
+		case 1: swap(2,3,0,1); break;
+		case 2: swap(3,0,1,2); break;
+		case 3: swap(1,0,3,2); break;
+		case 4: swap(3,2,1,0); break;
+		case 5: swap(3,2,0,1); break;
+		case 6: swap(2,3,0,1); break;
+		case 7: swap(2,3,1,0); break;
 	}
 
 	document.querySelector("#r1").style.backgroundColor = colors[0];
@@ -764,6 +800,15 @@ function shuffle_colors(question) {
 	document.querySelector("#r3").style.backgroundColor = colors[2];
 	document.querySelector("#r4").style.backgroundColor = colors[3];
 	
+	function swap(i0,i1,i2,i3) {
+		colors[0] = COLORS[i0];
+		colors[1] = COLORS[i1];
+		colors[2] = COLORS[i2];
+		colors[3] = COLORS[i3];	
+		question.oldanswer = question.answer;
+		question.answer = COLORS.indexOf(colors[question.answer-1])+1;
+	}
+
 }
 
 // ***************************************************************************
@@ -1191,11 +1236,10 @@ function onmessage(msg) {
 			break;
 
 		case "answer":
-			console.log("    CANREPLY="+canreply);
 			if(!canreply) break;
 			var user = get_user(msg);
-			console.log("    USER="+user);
 			if (!user) break;
+			if(msg.index!=qindex+1) break;
 			user.rep = msg.value;
 			if (msg.value == questions[qindex].answer) {
 				user.score++;
