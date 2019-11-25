@@ -345,7 +345,54 @@
 			background-color:#AAA;
 		}
 			
-		
+
+	#votes {
+		display:none;
+		position:fixed;
+		width:100%;
+		left:0px;
+		z-index:10;
+	}
+
+	#votes .quadrant {
+		position:absolute;
+		height:50%;
+		width:50%;
+		text-align:center;
+		font-size:4.5vw;
+		display:flex;
+		justify-content:center;
+		align-items:center;
+	}
+
+	#votes .quadrant span {
+		letter-spacing:10px;
+	}
+	
+	#votes #v1 {
+		top:0%;
+		left:0%;
+		background-color: #FF8;
+	}
+
+	#votes #v2 {
+		top:50%;
+		left:0%;
+		background-color: #88F;
+	}
+
+	#votes #v3 {
+		top:0%;
+		left:50%;
+		background-color: #8F8;
+	}
+
+	#votes #v4 {
+		top:50%;
+		left:50%;
+		background-color: #F88;
+	}
+	
 	</style>
 </head>
 
@@ -404,6 +451,11 @@
 				<label for="rcolor" class="noselect" ></label>
 			</div>
 			<div>
+				<input type="checkbox" name="showvotes" id="showvotes"/>
+				<span class="checkmark"></span>
+				<label for="showvotes" class="noselect" ></label>
+			</div>
+			<div>
 				<input type="checkbox" name="showrep" id="showrep"/>
 				<span class="checkmark"></span>
 				<label for="showrep" class="noselect" ></label>
@@ -443,6 +495,13 @@
 		</div>
 		<table class="users" width="100%" border="0">
 		</table>
+	</div>
+	
+	<div id="votes">
+		<div id="v1" class="quadrant"><span></span></div>
+		<div id="v2" class="quadrant"><span></span></div>
+		<div id="v3" class="quadrant"><span></span></div>
+		<div id="v4" class="quadrant"><span></span></div>
 	</div>
 
 </body>
@@ -813,33 +872,76 @@ function shuffle_colors(question) {
 
 // ***************************************************************************
 
-	function finish_question() {
+function finish_question() {
 
+	canreply = false;
 
-		canreply = false;
+	show_votes();
 
-		var showrep = document.querySelector("#setup input#showrep").checked;
+}
 
-		if(showrep) {
+// ***************************************************************************
 
-			var question = questions[qindex];
-			var answer = question.oldanswer || question.answer;
+function show_votes() {
 
-			for (var i = 1; i <= 4; i++)
-				if (i != answer)
-					document.querySelector("#r" + i + " .mask").style.display = "block";
+	var showvotes = document.querySelector("#setup input#showvotes").checked;
 
-			setTimeout(show_score, 4000);
+	if(showvotes) {
+		var choices = document.querySelector("#choices");
+		var r = choices.getBoundingClientRect();
+
+		var votes = document.querySelector("#votes");
+		votes.style.display = "block";
+		votes.style.height = r.height+"px";
+		votes.style.top = (((window.innerHeight-r.height)/2-r.height/2)|0)+"px"
+
+		var count = {};
+		for(var i=0;i<users.length;i++) 
+			count[users[i].rep] = (count[users[i].rep]||0)+1;
+
+		for(var i=1;i<=4;i++) {
+			var el = document.querySelector("#v"+i+" span");
+			el.innerText = "";
+			for(var j=0;j<count[""+i];j++)
+				el.innerText += "❋"
 		}
-		else
-			setTimeout(show_score,0);
 
+		setTimeout(show_answers,4000);
 	}
+	else 
+		setTimeout(show_answers,100);
 
+}
+
+// ***************************************************************************
+
+
+function show_answers() {
+			
+
+
+	var showrep = document.querySelector("#setup input#showrep").checked;
+	if(showrep) {
+
+		var question = questions[qindex];
+		var answer = question.oldanswer || question.answer;
+
+		for (var i = 1; i <= 4; i++)
+			if (i != answer)
+				document.querySelector("#r" + i + " .mask").style.display = "block";
+
+		setTimeout(show_score, 4000);
+	}
+	else 
+		setTimeout(show_score,100);
+
+}
 
 // ***************************************************************************
 
 	function show_score() {
+
+	hide_votes();
 
 		display_users("score","score");
 		show_page("score");
@@ -1320,6 +1422,7 @@ function onsetup() {
 	document.querySelector("#setup .header span").innerText = i18n(I_SETUP);
 	document.querySelector("#setup label[for='showrep']").innerText = i18n(I_SHOW);
 	document.querySelector("#setup label[for='rcolor']").innerText = i18n(I_COLOR);
+	document.querySelector("#setup label[for='showvotes']").innerText = i18n(I_VOTES);
 
 	show_delay();
 
@@ -1369,6 +1472,14 @@ function get_pids() {
 	for(var i=0;i<users.length;i++)
 		p.push(users[i].pid);
 	return p;
+}
+
+// ***************************************************************************
+
+function hide_votes() {
+
+	document.querySelector("#votes").style.display = "none";
+
 }
 
 // ***************************************************************************
