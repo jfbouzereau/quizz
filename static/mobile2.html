@@ -202,6 +202,7 @@ var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
 // player id
 var pid = 0;
 
+var ntry = 0;
 if(window.fetch) {
 	var send = sendfetch;
 	var poll = pollfetch;
@@ -228,6 +229,7 @@ function ondown(event) {
 		try { navigator.vibrate(100); } catch(err) {}
 		answer = m[1];
 		target.classList.add("pressed");
+		ntry = 1;
 		send({type:"answer",value:m[1],index:qindex,gid:gid,pid:pid});
 	}
 }
@@ -273,6 +275,7 @@ function show_status(line1,line2,line3) {
 
 //****************************************************************************
 
+
 function sendfetch(msg) {
 
     var options = {};
@@ -283,7 +286,13 @@ function sendfetch(msg) {
     fetch("/msg",options)
         .then( function(res) { return res.json() }  )
         .then(onmessage)
-        .catch( function(err) { console.log(err) });
+        .catch( function(err) {
+			console.log(err)
+			if(ntry<3) {
+				ntry++;
+				sendfetch(msg);
+			}
+		});
 }
 
 //****************************************************************************
@@ -299,6 +308,13 @@ function sendxhr(msg) {
     xhr.onload = function() {
         onmessage(xhr.response);
     }
+	xhr.onerror = function(err) {
+		console.log(err);
+		if(ntry<3) {
+			ntry++;
+			sendxhr(msg);
+		}
+	}
 
 }
 

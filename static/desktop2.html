@@ -15,6 +15,7 @@
 		body {
 			margin: 0px;
 			transition: opacity 0.1s;
+			overflow:hidden;
 		}
 
 		.noselect {
@@ -167,7 +168,18 @@
 			bottom:12vh;
 		}
 
-		.games tr td {
+		.games .wrapper {
+			overflow-y:scroll;
+			height:100%;
+		}
+
+		.games .wrapper ul {
+			list-style:none;
+			margin:0px;
+			padding:0px;
+		}
+
+		.games .wrapper ul li {
 			font-size: 48px;
 			font-family: myfont;
 			text-align: center;
@@ -175,7 +187,7 @@
 			cursor:pointer;
 		}
 
-		.games tr td:hover {
+		.games .wrapper ul li:hover {
 			background-color:#DDD;
 		}
 
@@ -413,8 +425,12 @@
 		<div class="header">
 			<span></span>
 		</div>
-		<table class="games" width="100%" border="0">
-		</table>
+		<div class="games" >
+			<div class="wrapper">
+				<ul>
+				</ul>
+			</div>
+		</div>
 		<div class="footer">
 			<button></button>
 		</div>
@@ -517,6 +533,7 @@
 	var qindex = -1;
 
 	var canreply = false;
+	var ntry = 0;
 
 	var t1 = null;	// start of game
 
@@ -536,7 +553,7 @@
 	document.querySelector("#welcome button").addEventListener("click",
 		show_games);
 
-	document.querySelector("#games table.games").addEventListener("click",
+	document.querySelector("#games .wrapper ul").addEventListener("click",
 		select_game);
 
 	document.querySelector("#games").addEventListener("dragover",ondrag);
@@ -549,8 +566,6 @@
 
 	document.querySelector("#setup .footer button").addEventListener("click",onsetupok);
 
-	document.body.addEventListener("keydown", onkeydown);
-	
 	document.body.focus();
 
 	show_page("welcome");
@@ -609,11 +624,11 @@ function onkeydown(event) {
 // ***************************************************************************
 
 	function update_game_list() {
-		var table = document.querySelector("#games table.games");
+		var ul = document.querySelector("#games .wrapper ul");
 		var s = "";
 		for(var i=gameoffset;i<games.length;i++) 
-			s += "<tr><td>"+games[i].name+"</td></tr>";
-		table.innerHTML = s;
+			s += "<li>"+games[i].name+"</li>";
+		ul.innerHTML = s;
 	}
 
 // ***************************************************************************
@@ -621,7 +636,7 @@ function onkeydown(event) {
 	function select_game(event) {
 
 		var target = event.target;
-		if(target.tagName!="TD") return;
+		if(target.tagName!="LI") return;
 
 		for(var i=0;i<games.length;i++) 
 			if(games[i].name==target.innerText) 
@@ -774,6 +789,7 @@ function onkeydown(event) {
 			shuffle_colors(question);
 
 
+		ntry = 1;
 		send({ type: "question",index:qindex+1,gid:gid ,pids:get_pids()});
 
 		function f0() {
@@ -1265,7 +1281,13 @@ function send(msg){
 	fetch("/msg",options)
 		.then( function(res) { return res.json() }	)
 		.then(onmessage)
-		.catch( function(err) { console.log(err) });
+		.catch( function(err) {
+			console.log(err)
+			if(ntry<3) {
+				ntry++;
+				send(msg);
+			}
+		});
 }
 
 // ***************************************************************************
