@@ -585,8 +585,9 @@ function onkeydown(event) {
 		var button = document.querySelector("#games .footer button");
 		button.innerText = i18n(I_SETUP);
 
-		if(games)
+		if(games) {
 			f3();
+			}
 		else
 			fetch("/games.json").then(f1).then(f2);
 
@@ -633,10 +634,14 @@ function onkeydown(event) {
 
 		gindex = index;
 
-		var game = games[gindex];
+		var game = JSON.parse(JSON.stringify(games[gindex]));
 
 		questions = game.questions;
 
+		document.querySelector("#r1").style.backgroundColor = COLORS[0];
+		document.querySelector("#r2").style.backgroundColor = COLORS[1];
+		document.querySelector("#r3").style.backgroundColor = COLORS[2];
+		document.querySelector("#r4").style.backgroundColor = COLORS[3];
 
 		qindex = -1;
 
@@ -826,6 +831,7 @@ function onkeydown(event) {
 function shuffle_colors(question) {
 
 	var colors = [0,0,0,0];
+	var ncolors = ["jaune","bleu","vert","rouge"];
 
 	var ran = (Math.random()*8)|0;
 	switch(ran) {
@@ -851,6 +857,11 @@ function shuffle_colors(question) {
 		colors[3] = COLORS[i3];	
 		question.oldanswer = question.answer;
 		question.answer = COLORS.indexOf(colors[question.answer-1])+1;
+		console.log("COLORS "+COLORS.join(","));
+		console.log("colors "+colors.join(","));
+		console.log("COLORS.indexOf("+colors[question.oldanswer-1]+") ="+
+			COLORS.indexOf(colors[question.oldanswer-1]));
+		console.log("ANSWER WAS "+question.oldanswer+" IS NOW "+question.answer);
 	}
 
 }
@@ -946,7 +957,7 @@ function show_answers() {
 				pid: user.pid,
 				line1: format_reply(user.rep),
 				line2: i18n(I_USCORE, user.score + " / " + (qindex+1)),
-				line3: (qindex + 1 >= questions.length) ? "" : i18n(I_WAIT, qindex + 2)
+				line3: format_score(qindex,user.score)
 			};
 			send(msg);
 		}
@@ -961,6 +972,16 @@ function show_answers() {
 
 // ***************************************************************************
 
+	function format_score(qindex,score) {
+		if(qindex+1<questions.length)
+			return i18n(I_WAIT,qindex+2);
+		else if(score==questions.length)
+			return "🏆" 
+		else
+			return "";
+	}
+
+
 	function format_reply(rep) {
 		if (rep == null)
 			return i18n(I_NANSWER);
@@ -972,8 +993,11 @@ function show_answers() {
 // ***************************************************************************
 
 	function next_question() {
-		if (qindex + 1 >= questions.length)  
+		if (qindex + 1 >= questions.length)   {
+			games = null;
+			preload = default_preloader;
 			setTimeout(show_games,10000);
+		}
 		else
 			show_question(qindex + 1);
 	}
@@ -1138,6 +1162,8 @@ function ondrag(event) {
 
 function ondrop(event) {
 
+	console.log("ONDROP");
+
 	event.preventDefault();
 
 	var entries = null;
@@ -1176,7 +1202,7 @@ function ondrop(event) {
 	function f4(text) {
 		try {
 			games = JSON.parse(text);
-			show_games();		
+			show_games();
 			preload = zip_preloader;
 		}
 		catch(err) {
@@ -1346,7 +1372,7 @@ function onmessage(msg) {
 				pid: msg.pid,
 				line1: format_reply(msg.value),
 				line2: i18n(I_THANKS),
-				line3: ""
+				line3:""
 			});
 			break;
 
