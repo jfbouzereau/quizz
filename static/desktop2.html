@@ -400,7 +400,18 @@
 		left:50%;
 		background-color: #F88;
 	}
-	
+
+	.help {
+		position:fixed;
+		bottom:20px;
+		right:20px;
+		height:10px;
+	}
+	.help a {
+		text-decoration:none;
+		cursor:pointer;
+		color:white;
+	}	
 	</style>
 </head>
 
@@ -418,6 +429,8 @@
 		</table>
 		<div class="footer">
 			<button>OK</button>
+		</div>
+		<div class="help"><a href="https://github.com/jfbouzereau/quizz">?</a>
 		</div>
 	</div>
 
@@ -597,16 +610,25 @@ function onkeydown(event) {
 
 	function show_games() {
 
+		console.log("SHOW GAMES");
+		console.log(games);
+
 		var button = document.querySelector("#games .footer button");
 		button.innerText = i18n(I_SETUP);
 
 		if(games) {
 			f3();
 			}
-		else
-			fetch("/games.json").then(f1).then(f2);
+		else {
+			console.log("FETCH");
+			fetch("/games.json").then(f1).then(f2).catch(failure);
+		}
 
-		function f1(response) { return response.text() }
+		function failure(err) {
+			console.log(err);
+		}
+
+		function f1(response) { console.log(response); return response.text() }
 
 		function f2(text) { games = JSON.parse(text); f3(); }
 
