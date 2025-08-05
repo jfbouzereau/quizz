@@ -137,6 +137,7 @@ body {
 	background-color:#999;
 	border:none;
 	width:200px;
+	height:80px;
 	color:white;
 }
 
@@ -151,7 +152,7 @@ body {
 
 <div class="page" id="welcome">
 	<div class="content">
-		<div class="prompt">...</div>
+		<div class="prompt">...</div> 
 		<br>
 		<input type="text" id="user" />
 		<br>
@@ -172,7 +173,9 @@ body {
 	<div id="three" class="part"><div class="content"></div></div>
 </div>
 </body>
+<script src="fullscreen.js"></script>
 <script>
+var seq = 0;
 var logged = false;
 var COLORS = ["#FF8","#88F","#8F8","#F88"];
 
@@ -180,13 +183,31 @@ var input = document.querySelector("input#user");
 input.addEventListener("change",onchange);
 document.querySelector("#welcome button").addEventListener("click",onchange);
 
+/*
+try	{
+	screen.orientation.lock("natural").
+		then(function(){ alert("screen locked") }).
+		catch(function(err) { alert(err) })
+	}
+catch(err) {
+	alert(err);
+	console.log(err);
+	}
+*/
+
 var user = localStorage.getItem("quizz/user");
+try {
+	var uuu = get_param("n");
+	if(uuu) user = uuu;
+}
+catch(err) {}
 
 var WebSocket = window.WebSocket || window.MozWebSocket;
-var cn = new WebSocket("ws://"+document.location.host);
+var cn = new WebSocket("wss://"+document.location.host);
 cn.onopen = onopen;
 cn.onerror = onerror;
 cn.onmessage = onmessage;
+cn.onclose = onclose;
 
 var timer = null;
 
@@ -202,24 +223,27 @@ else {
 }
 
 
-function ondown(event) {		
+function ondown(event) {			
+	event.preventDefault();
 	if(answer) return;
 	var target = event.target;
 	var m = target.id.match(/^r([1-4])$/);
 	if(m)
-		timer = setTimeout(validate,200);
+		timer = setTimeout(validate,100);
 
 	function validate() {
 		timer = null;
 		try { navigator.vibrate(100); } catch(err) {}
 		answer = m[1];
 		target.classList.add("pressed");
-		send({type:"answer",value:m[1]});
 	}
 }
 
 function onup(event) {
+	event.preventDefault();
 	if(timer) { clearTimeout(timer) ; timer = null; }
+	if(!answer) return;
+	send({type:"answer",value:answer});
 }
 
 function onchange() {
@@ -229,28 +253,36 @@ function onchange() {
 	if(!user) return;
 	localStorage.setItem("quizz/user",user);
 	send({type:"user",value:user});
+	setfull();
 }
 
 
 function onopen() {
-	// last part of url is game id
-	var gid = location.href.replace(/.*[/]/,"").replace(/[?].*/,"");
-	send({type:"mobile",gid:gid});
+	send({type:"mobile",gid:0});
     }
 
 function onerror(err) {
     }
 
+function onclose() {
+	window.location.reload();
+}
+
 function onmessage(event) {
 
 	console.log("MESSAGE "+event.data);
     var msg = JSON.parse(event.data);
+	if(msg.seq) {
+		if(msg.seq<=seq) return;
+		seq = msg.seq;
+	}
 
 	switch(msg.type) {
 		case "welcome":	
 			document.querySelector("#welcome .prompt").innerText = msg.prompt;
 			input.value = user || "";
 			show_page("welcome");
+			setTimeout(focus,100);
 			break;
 
 		case "question" :		
@@ -266,8 +298,23 @@ function onmessage(event) {
 		case "close":
 			window.close();
 			break;
+
+		case "error":
+			if(msg.value="nogame")
+				alert("Pas de jeu en cours");
+			break;
         }
     }
+
+function focus() {
+	document.querySelector("#welcome .content input").focus();
+}
+
+function setfull() {
+	if(screenfull)
+		if(screenfull.isEnabled)
+			screenfull.toggle();
+}
 
 function clear() {
 	var els = document.querySelectorAll(".pressed");
@@ -297,5 +344,26 @@ function send(msg) {
 	catch(err) {
 		}
 }
+
+// ***************************************************************************
+
+
+function get_param(name) {
+
+    var s = location.search.substring(1).split("&");
+    for(var i=0;i<s.length;i++) {
+        var p = s[i].split("=");
+        if(p.length==2)
+            if(p[0]==name)
+                return p[1];
+    }
+
+    return null;
+}
+
+
+// ***************************************************************************
+
+
 </script>
 </html>
