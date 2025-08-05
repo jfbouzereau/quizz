@@ -1,438 +1,335 @@
-<!DOCTYPE html>
+e!DOCTYPE html>
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<style>
-		@font-face {
-			font-family: myfont;
-			font-style: normal;
-			font-weight: 400;
-			src: url(josefinslab.ttf);
-		}
+<meta charset="UTF-8">
+<title>QUIZZ</title>
+<style>
+@font-face {
+	font-family: myfont;
+	font-style: normal;
+	font-weight: 400;
+	src: url(josefinslab.ttf);
+}
 
-		body {
-			margin: 0px;
-			transition: opacity 0.1s;
-		}
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+transition: opacity 0.1s;
+}
 
-		.noselect {
-			-webkit-touch-callout: none; /* iOS Safari */
-			-webkit-user-select: none; /* Safari */
-			-khtml-user-select: none; /* Konqueror HTML */
-			-moz-user-select: none; /* Old versions of Firefox */
-			-ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version */
-		}
+iframe	{
+	display:none;
+}
 
-		.page {
-			display:none;
-			position:fixed;
-			left:0px;
-			top:0px;
-			width:100%;
-			height:100%;
-		}
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Old versions of Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; /* Non-prefixed version */
+}
 
-		#question {
-			position: fixed;
-			top: 0px;
-			left: 0px;
-			height: 80%;
-			width: 100%;
-			background-color: black;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
+.page {
+	display:none;
+	position:fixed;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+	flex-direction:column;
+	justify-content:space-between;
+}
 
-		#question img {
-			transition: height 0.5s;
-		}
+.header {
+	left: 0px;
+	width: 100%;
+	height: 12vh;
+	border-collapse: collapse;
+	background-color: #AAA;
+	color: white;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
 
-		#choices {
-			position: fixed;
-			top: 80%;
-			left: 0px;
-			height: 20%;
-			width: 100%;
-		}
+.header span {
+	text-align: center;
+	font-family: myfont;
+	font-size: 6vw;
+	letter-spacing: 2px;
+}
 
-		#choices .rect {
-			position: fixed;
-			width: 50%;
-			height: 10%;
-			text-align: center;
-			font-family: myfont;
-			font-size: 36px;
-			color: #333;
-			overflow:hidden;
-		}
+#welcome .content {			
+	display:flex;
+	flex-direction:row;
+	flex:auto;
+}
 
-		#choices .rect span {
-			font-size:4.5vw;
-			position:absolute;
-			left:50%;
-			top:54%;
-			width:100%;
-			transform: translate(-50%,-50%);
-			transition: font-size 0.5s;
-			overflow:hidden;
-		}
+#welcome .content .left {
+	width:50%;
+	overflow:hidden;
+}
 
-		#choices .rect.zero span {
-			font-size:1px;
-		}
+#welcome .content .right {
+	width:50%;
+}
 
-		#r1 {
-			top: 80%;
-			left: 0px;
-			background-color: #FF8;
-		}
+.footer {
+	width: 100%;
+	height: 12vh;
+	background-color: #AAA;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
 
-		#r2 {
-			top: 90%;
-			left: 0px;
-			background-color: #88F;
-		}
+.footer button {
+	font-size: 5vh;
+	font-family: myfont;
+	border-radius: 10px;
+	padding-left: 15vw;
+	padding-right: 15vw;
+	background-color: inherit;
+	color: white;
+	border:2px solid white;
+	cursor:pointer;
+	padding-top:2vh;
+	padding-bottom:1vh;
+}
 
-		#r3 {
-			top: 80%;
-			left: 50%;
-			background-color: #8F8;
-		}
+.footer button:hover {
+	background-color:white;
+	color:#AAA;
+}
 
-		#r4 {
-			top: 90%;
-			left: 50%;
-			background-color: #F88;
-		}
+.footer label {
+	font-size:6vh;
+	font-family:myfont;
+	color:white;
+	cursor:pointer;
+}
 
-		#chrono {
-			position: fixed;
-			top: 10px;
-			right: 10px;
-			width: 80px;
-			height: 80px;
-			z-index: 10;
-		}
+#question {
+	background-color: black;
+	height:80vh;
+	width:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
+#question img {
+	transition: height 0.5s;
+	height:100%;
+}
 
-		.users {
-			position: fixed;
-			top: 12vh;
-			width: 100%;
-			left: 0px;
-			bottom:12vh;
-			table-layout:fixed;
-			white-space:nowrap;			
-		}
+#choices {
+	height: 20vh;
+	width: 100%;
+	display:flex;
+	flex-direction:row;
+}
 
-		.users thead {
-			display: block;
-		}
+#choices .half  {
+	display:flex;
+	flex-direction:column;
+	width:50%;
+	height:20vh;
+}
 
-		.users tbody {
-			display: block;
-			overflow-y: auto;
-		}
+#choices .half div  {
+	height: 10vh;
+	text-align: center;
+	font-family: myfont;
+	font-size: 36px;
+	color: #333;
+	overflow:hidden;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
 
-		.users tr td {
-			font-size: 5vw;
-			font-family: myfont;
-			text-align: left;
-			height:10vh;
-		}
+#choices .half div.wrong {
+	background-color:white;
+}
 
-		.users tr td .name {
-			overflow:hidden;
-			white-space:nowrap;
-			width:44vw;
-		}
+#choices .half div span {
+	font-size:4vw;
+	font-weight:bold;
+	transition: font-size 0.5s;
+	overflow:hidden;
+}
 
-		.users tr td.total {
-			text-align:right;
-		}
+#choices .half div.wrong span {
+	color:white;
+}
 
-		.games {
-			position:fixed;
-			top:12vh;
-			width:100%;
-			left:0px;
-			bottom:12vh;
-		}
+#choices .half div.zero span {
+	font-size:1px;
+}
 
-		.games tr td {
-			font-size: 48px;
-			font-family: myfont;
-			text-align: center;
-			padding:20px;
-			cursor:pointer;
-		}
+#r1 {
+	background-color: #FF8;
+}
 
-		.games tr td:hover {
-			background-color:#DDD;
-		}
+#r2 {
+	background-color: #88F;
+}
 
-		.header {
-			position: fixed;
-			top: 0px;
-			left: 0px;
-			width: 100%;
-			height: 12vh;
-			border-collapse: collapse;
-			background-color: #AAA;
-			color: white;
-			display:flex;
-			justify-content:center;
-			align-items:center;
-		}
-		
-		.header span {
-			text-align: center;
-			font-family: myfont;
-			font-size: 6vw;
-			letter-spacing: 2px;
-		}
+#r3 {
+	background-color: #8F8;
+}
 
-		.footer {
-			position: fixed;
-			bottom: 0px;
-			left: 0px;
-			width: 100%;
-			height: 12vh;
-			background-color: #AAA;
-			display:flex;
-			justify-content:center;
-			align-items:center;
-		}
+#r4 {
+	background-color: #F88;
+}
 
-		.footer button {
-			font-size: 5vh;
-			font-family: myfont;
-			border-radius: 10px;
-			padding-left: 15vw;
-			padding-right: 15vw;
-			background-color: inherit;
-			color: white;
-			padding-top:8px;
-			padding-bottom:8px;
-			border:2px solid white;
-			cursor:pointer;
-		}
+#chrono {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	width: 80px;
+	height: 80px;
+	z-index: 10;
+}
 
-		.footer button:hover {
-			background-color:white;
-			color:#AAA;
-		}
+#number {
+	position:fixed;
+	top:10px;
+	left:0px;	
+	width:80px;
+	z-index:10;
+	font-size: 5vw;
+	font-family: myfont;
+	font-weight:bold;
+	text-align:center;
+	color:white;
+	background-color:black;
+}
 
-		.footer label {
-			font-size:6vh;
-			font-family:myfont;
-			color:white;
-			cursor:pointer;
-		}
+#welcome .content .left .users {
+	width:100%;
+	text-align:center;
+}
 
-		.setup {
-			position:fixed;
-			top:12vh;
-			width:100%;
-			left:0px;
-			bottom:12vh;
-			display:flex;
-			flex-direction:column;
-			justify-content:space-around;
-			align-items:center;
-		}
+.users span {
+	font-size: 4vw;
+	font-family: myfont;
+	text-align: center;
+	height:7vh;
+	width:100%;
+	white-space:nowrap;
+	text-overflow:clip;
+	overflow:hidden;
+}
 
-		.setup input {
-			opacity:0;
-		}
+#score {
+	display:flex;
+	flex-direction:column;
+	align-items:start;
+}
 
-		.setup label {
-			font-family:myfont;
-			font-size:6vh;
-			color:#AAA;
-			cursor:pointer;
-		}
+#score .content {	
+	display:flex;
+	flex-direction:row;
+	height:100%;
+}
 
-		.setup input ~ .checkmark:after {
-			content: "✔︎";
-			font-family:myfont;
-			font-size:6vh;
-			color:#AAA;
-			opacity:0;
-		}
+#score .content .left {
+	width:10vw;
+}
 
-		.setup input:checked ~ .checkmark:after {
-			opacity:1;
-		}
+#score .content .right {
+	width:10vw;
+}
 
-		.setup span.delay {
-			font-family:myfont;
-			font-size:6vh;
-			color:#AAA;
-		}
+#score .content .center {
+	width:80vw;
+	display:flex;
+	flex-direction:column;
+	justify-items:start;
+}
 
-		.setup button {
-			width:40px;
-			height:40px;
-			color:#AAA;
-			border:3px solid #AAA;
-			border-radius:5px;
-			background-color:white;
-			font-size:4vh;
-			margin-left:10px;
-			margin-right:10px;
-			cursor:pointer;
-		}
+#score .content .center table {
+	font-size:6vh;
+	font-family: myfont;
+	text-align: center;
+	height:9vh;
+	width:600px;
+}
 
-		.setup button:hover {
-			background-color:#AAA;
-			color:white;
-		}
+#score .content .center table tr td {
+	overflow:hidden;
+	text-wrap-mode:nowrap;
+	text-overflow:clip;
+}
 
-		.mask {
-			position: absolute;
-			left: 0px;
-			top: 0px;
-			width: 100%;
-			height: 100%;
-			background-color: #FFFD;
-		}
+#welcome button:disabled {
+	color: #BBB;
+}
 
-		#welcome button:disabled {
-			color: #BBB;
-		}
+.qrcode {
+	position: fixed;
+	top: 12vh;
+	width: 50%;
+	left: 50%;
+	bottom:12vh;
+	table-layout:fixed;
+	white-space:nowrap;			
+}
 
-		#qrcode {
-			display:none;
-			position:fixed;
-			left:0px;
-			top:12vh;
-			bottom:12vh;
-			width:100%;
-			border:1px solid #AAA;
-			background-color:white;
-			z-index:10;
-		}
+.qrcode .area {
+	position: absolute;
+}
 
-		#area {
-			position:absolute;
-		}
-
-		#loading .progress {
-			position:absolute;
-			width:100%;
-			background-color:white;
-			top:12vh;	
-			bottom:0px;
-			display:flex;
-			justify-content:center;
-			align-items:center;
-		}
-
-		#loading .progress .meter {
-			width:50vw;
-			height:100px;
-			background-color:#EEE;
-		}
-
-		#loading .progress .meter .bar {
-			position:relative;
-			width:0;
-			height:100%;
-			background-color:#AAA;
-		}
-			
-		
-	</style>
+</style>
 </head>
 
 <body>
 
-	<div id="qrcode">
-		<div id="area"></div>
-	</div>
 
 	<div class="page" id="welcome">
 		<div class="header">
-			<span></span>
+			<span>https://lerallyemobile.fr:8000</span>
 		</div>
-		<table class="users" width="100%" border="0">
-		</table>
-		<div class="footer">
-			<button>OK</button>
-		</div>
-	</div>
-
-	<div class="page" id="games">
-		<div class="header">
-			<span></span>
-		</div>
-		<table class="games" width="100%" border="0">
-		</table>
-		<div class="footer">
-			<button></button>
-		</div>
-	</div>
-
-	<div class="page" id="loading">
-		<div class="header">
-			<span></span>
-		</div>
-		<div class="progress">
-			<div class="meter">
-				<div class="bar"></div>
+		<div class="content">
+			<div class="left">
+				<div class="users" border="0" width="100%">
+				</div>
 			</div>
-		</div>
-	</div>
-
-	<div class="page" id="setup">
-		<div class="header">
-			<span></span>
-		</div>
-		<div class="setup noselect">
-			<div>
-				<button class="minus">-</button>
-				<span class="delay"></span>
-				<button class="plus">+</button>
-			</div>
-			<div>
-				<input type="checkbox" name="rcolor" id="rcolor"/>
-				<span class="checkmark"></span>
-				<label for="rcolor" class="noselect" ></label>
-			</div>
-			<div>
-				<input type="checkbox" name="showrep" id="showrep"/>
-				<span class="checkmark"></span>
-				<label for="showrep" class="noselect" ></label>
+			<div class="right">
+				<div class="qrcode">
+					<div class="area"></div>
+				</div>
 			</div>
 		</div>
 		<div class="footer">
 			<button>OK</button>
 		</div>
 	</div>
+
 
 	<div class="page" id="pageq">
 		<div id="chrono">
 			<canvas width="80" height"80" />
 		</div>
+		<div id="number">
+		</div>
 		<div id="question">
 			<img id="image" src="" />
 		</div>
 		<div id="choices">
-			<div id="r1" class="rect"><span></span>
-				<div class="mask"></div>
+			<div class="half">
+			<div id="r1"><span></span></div>
+			<div id="r2"><span></span></div>
 			</div>
-			<div id="r3" class="rect"><span></span>
-				<div class="mask"></div>
-			</div>
-			<div id="r2" class="rect"><span></span>
-				<div class="mask"></div>
-			</div>
-			<div id="r4" class="rect"><span></span>
-				<div class="mask"></div>
+			<div class="half">
+			<div id="r3"><span></span></div>
+			<div id="r4"><span></span></div>
 			</div>
 		</div>
 	</div>
@@ -441,70 +338,68 @@
 		<div class="header">
 			<span>SCORE</span>
 		</div>
-		<table class="users" width="100%" border="0">
-		</table>
+		<div class="content">
+			<div class="left"> </div>
+			<div class="center">
+				<table> </table>
+			</div>
+			<div class="right"></div>
+		</div>
 	</div>
 
 </body>
+<script src="fullscreen.js"></script>
 <script src="qrcode.js"></script>
-<script src="zip.js"></script>
 <script src="i18n.js"></script>
 <script>
+	var seq = 0;
+
 	var COLORS = ["#FF8","#88F","#8F8","#F88"];
 
-	var delay = 15; // each question is proposed during 15 seconds
+	// chart canvas
+	var chart = document.createElement("canvas");
+	var w = chart.width = 600;
+	var h = chart.height = 600;
 
-	var canvas = document.querySelector("#chrono canvas");
+	// each question proposed during 20 seconds
+	var delay = get_delay() || 25;
+	var gname = get_param("game") || "test";
+	var ratio = get_param("ratio") || "1";
+
+	var chrono = document.querySelector("#chrono canvas");
 
 	var WebSocket = window.WebSocket || window.MozWebSocket;
-	var cn = new WebSocket("ws://" + document.location.host);
-
-	var gid = null;
-
-	var games = null;
-	var gindex= -1;
-
-	var questions = null;
-	var qindex = -1;
+	var cn = new WebSocket("wss://" + document.location.host);
 
 	var canreply = false;
+
+	var gid =0;
 
 	var t1 = null;	// start of game
 
 	var users = [];
 
-	var preload = default_preloader;
+	var game = null;
 	var images = [];		// preloaded images
+	var questions = null;
+	var qindex = -1;
 
+	var showrep = get_param("rep")!="no";
 
+	load_game(gname);
 
-	document.querySelector("#welcome .header").addEventListener("mouseenter",
-		show_qrcode);
+	document.querySelector("#question img").style.transform = 
+		`scale(${ratio},1)`;
+		
+	document.querySelector("#welcome .header").
+		addEventListener("dblclick",ondblclick);
+	document.querySelector("#welcome .footer button").
+		addEventListener("click",start_game);
 
-	document.querySelector("#welcome .header").addEventListener("mouseleave",
-		hide_qrcode);
-
-	document.querySelector("#welcome button").addEventListener("click",
-		show_games);
-
-	document.querySelector("#games table.games").addEventListener("click",
-		select_game);
-
-	document.querySelector("#games").addEventListener("dragover",ondrag);
-	document.querySelector("#games").addEventListener("drop",ondrop);
-
-	document.querySelector("#games .footer button").addEventListener("click",onsetup);
-
-	document.querySelector(".setup button.minus").addEventListener("click",onminus);
-	document.querySelector(".setup button.plus").addEventListener("click",onplus);
-
-	document.querySelector("#setup .footer button").addEventListener("click",onsetupok);
-
-	show_page("welcome");
-
+	setInterval(show_qrcode,1000);
 
 	cn.onopen = function () {
-		send({ type: "desktop"});
+		send({ type: "desktop", seq});
 	}
 
 	cn.onerror = function (err) { }
@@ -516,15 +411,14 @@
 
 		switch (msg.type) {
 			case "gid":
-				// game id sent by the server
-				gid = msg.value;
 				var banner = document.querySelector("#welcome .header span");
-				banner.innerText = location.href.replace(/[?].*/,"")+gid;
+				show_page("welcome");
 				break;
 				
 			case "mobile":
 				var prompt = i18n(I_TEAM);
-				send({ type: "welcome", pid: msg.pid, prompt: prompt });
+				seq++;
+				send({ type: "welcome", pid: msg.pid, prompt: prompt, seq });
 				break;
 
 			case "user":
@@ -551,18 +445,22 @@
 				if(qindex<0) {
 					// game not started yet§
 					display_users("welcome","time");
+					seq++;
 					send({
 						type: "status",
 						pid: msg.pid,
+						seq,
 						line1: i18n(I_WELCOME, msg.value),
 						line2: "",
 						line3: i18n(I_WAIT, 1)
 					});
 				} 
 				else {
+					seq++;
 					send({
 						type:"status",
 						pid:msg.pid,
+						seq,
 						line1:i18n(I_WELCOME,msg.value),
 						line2:"",
 						line3: i18n(I_WAIT,qindex+1)
@@ -571,7 +469,12 @@
 				break;
 
 			case "answer":
-				if(!canreply) break;
+				if(!canreply) {
+					seq++;
+					send({ type: "retry", pid: msg.pid, seq });
+					break;
+				}
+
 				var user = get_user(msg);
 				if (!user) break;
 				user.rep = msg.value;
@@ -582,13 +485,19 @@
 				else
 					user.detail += "0";
 
+				seq++;
 				send({
 					type: "status",
 					pid: msg.pid,
+					seq,
 					line1: format_reply(msg.value),
 					line2: i18n(I_THANKS),
 					line3: ""
 				});
+				break;
+
+			case "busy":
+				alert("Un autre jeu est en cours");
 				break;
 
 			case "close":
@@ -600,173 +509,22 @@
 
 // ***************************************************************************
 
-	function show_games() {
-
-		var button = document.querySelector("#games .footer button");
-		button.innerText = i18n(I_SETUP);
-
-		if(games)
-			f3();
-		else
-			fetch("/games.json").then(f1).then(f2);
-
-		function f1(response) { return response.text() }
-
-		function f2(text) { games = JSON.parse(text); f3(); }
-
-		function f3() {
-
-			var td = document.querySelector("#games .header span");
-			td.innerText = i18n(I_GAMES);
-	
-			var table = document.querySelector("#games table.games");
-			var s = "";
-			for(var i=0;i<games.length;i++) 
-				s += "<tr><td>"+games[i].name+"</td></tr>";
-
-			table.innerHTML = s;
-			show_page("games");
-		}
-
-	}
-
-// ***************************************************************************
-
-	function select_game(event) {
-
-		var target = event.target;
-		if(target.tagName!="TD") return;
-
-		for(var i=0;i<games.length;i++) 
-			if(games[i].name==target.innerText) 
-				start_game(i);
-	}
-
-// ***************************************************************************
-
-	function start_game(index) {
-
-		gindex = index;
-
-		var game = games[gindex];
-
-		questions = game.questions;
-
-
-		qindex = -1;
-
-		for(var i=0;i<users.length;i++)
-			users[i].score = 0;
-
-	// shuffle questions
-		for (var k = 0; k < questions.length; k++) {
-			var k1 = (Math.random() * questions.length) | 0;
-			var k2 = (Math.random() * questions.length) | 0;
-			var temp = questions[k1];
-			questions[k1] = questions[k2];
-			questions[k2] = temp;
-		}
-
-		shuffle_choices();
-
-		document.querySelector("#welcome button").disabled = true;
-
-		preload();
-	}
-
-	function failure(err) {
-		alert("ERROR LOADING " + game);
-	}
-
-
-// ***************************************************************************
-
-	function default_preloader() {
-
-	document.querySelector("#loading .header span").innerText = i18n(I_LOAD);
-	show_page("loading");
-	show_bar(0);
-
-	images = [];
-	var nimg = 0;
-
-	var game = games[gindex];
-
-	for (var i = 0; i < questions.length; i++) {
-		var image = new Image();
-		image.addEventListener("load", onload);
-		image.addEventListener("error", onload);
-		image.src = game.name + "/" + questions[i].img;
-		images.push(image);
-	}
-
-
-	function onload() {
-		nimg ++;
-		show_bar(nimg/questions.length);
-		if(nimg==questions.length) 
-			show_question(0);		
-		}
-
-	}
-
-// ***************************************************************************
-
-	function show_bar(pct) {
-		var bar = document.querySelector("#loading .progress .meter .bar");
-		bar.style.width = ((pct*100)|0)+"%";
-	}
-
-// ***************************************************************************
-
-	function shuffle_choices(question) {
-
-		// equi distribution of answers
-		var num = [];
-		for(var k=0;k<questions.length;k++)
-			num[k] = (k%4)+1;
-
-
-		// shuffle
-		for(var k=0;k<2*questions.length;k++) {
-			var k1 = (Math.random() * questions.length) | 0;
-			var k2 = (Math.random() * questions.length) | 0;
-			var temp = num[k1];
-			num[k1] = num[k2];
-			num[k2] = temp;
-		}
-
-
-		for(var k=0;k<questions.length;k++) {
-			var question = questions[k];
-
-			// if answer is at the right place
-			if(question.answer==num[k]) continue;
-
-			// swap with num[k];
-			var k1 = num[k]-1;
-			var k2 = question.answer-1;
-
-			var temp = question.choices[k1];
-			question.choices[k1] = question.choices[k2];
-			question.choices[k2] = temp;
-
-			question.answer = num[k];
-		}
-
-	}
-
-// ***************************************************************************
 
 	function show_question(index) {
-
-		var game = games[gindex];
 
 		qindex = index;
 		var question = questions[index];
 
+		document.querySelector("#number").innerText = ""+(qindex+1);
+
 		for (var i = 0; i < users.length; i++)
 			users[i].rep = null;
+
+		document.querySelector("#r1").classList.add("zero");
+		document.querySelector("#r2").classList.add("zero");
+		document.querySelector("#r3").classList.add("zero");
+		document.querySelector("#r4").classList.add("zero");
+	
 
 		document.querySelector("#question img").height = 0;
 		document.querySelector("#question img").src = images[index].src;
@@ -775,58 +533,53 @@
 		document.querySelector("#r3 span").innerText = question.choices[2];
 		document.querySelector("#r4 span").innerText = question.choices[3];
 
-		for (var i = 1; i <= 4; i++)
-			document.querySelector("#r" + i + " .mask").style.display = "none";
 
-		document.querySelector("#r1").classList.add("zero");
-		document.querySelector("#r2").classList.add("zero");
-		document.querySelector("#r3").classList.add("zero");
-		document.querySelector("#r4").classList.add("zero");
-	
-		var rcolor = document.querySelector("#setup input#rcolor").checked;
-		if(rcolor)
-			shuffle_colors(question);
-
-
-		send({ type: "question" });
+		seq++;
+		send({ type: "question" , seq});
 
 		setTimeout(f0,  500);
 		setTimeout(f1, 1000);
-		setTimeout(f2, 1500);
-		setTimeout(f3, 2000);
-		setTimeout(f4, 2500);
-		setTimeout(f5, 3000);
-		setTimeout(f6, 3500);
+		setTimeout(f2, 6000);
+		setTimeout(f3, 6500);
+		setTimeout(f4, 7000);
+		setTimeout(f5, 7500);
+		setTimeout(f6, 8000);
 
 		function f0() {
+			send({ type: "question" , seq});
 			show_page("pageq");
 		}
 
 		function f1() {
+			send({ type: "question" , seq});
 			var el1 = document.querySelector("#question");
 			var el2 = document.querySelector("#choices");
 			var h = el2.offsetTop - el1.offsetTop;
 			document.querySelector("#question img").height = h;
-			setTimeout(f2,500);
 			}
 
 		function f2() {
+			send({ type: "question", seq });
 			document.querySelector("#r1").classList.remove("zero");
 		}
 
 		function f3() {
-			document.querySelector("#r2").classList.remove("zero");
-		}
-
-		function f4() {
+			send({ type: "question", seq });
 			document.querySelector("#r3").classList.remove("zero");
 		}
 
+		function f4() {
+			send({ type: "question", seq });
+			document.querySelector("#r2").classList.remove("zero");
+		}
+
 		function f5() {
+			send({ type: "question", seq });
 			document.querySelector("#r4").classList.remove("zero");
 		}
 
 		function f6() {
+			send({ type: "question", seq });
 			canreply = true;
 			start_chrono();
 		}
@@ -835,67 +588,61 @@
 
 // ***************************************************************************
 
-function shuffle_colors(question) {
-
-	var colors = COLORS.slice();
-
-	for(var k=0;k<4;k++) {
-		var k1 = (Math.random()*colors.length)|0;
-		var k2 = (Math.random()*colors.length)|0;
-		var temp = colors[k1];
-		colors[k1] = colors[k2];
-		colors[k2] = temp;
-	}
-
-	if(colors[question.answer-1]!=COLORS[question.answer-1])  {
-		question.oldanswer = question.answer;
-		question.answer = COLORS.indexOf(colors[question.answer-1])+1;
-	}
-
-	document.querySelector("#r1").style.backgroundColor = colors[0];
-	document.querySelector("#r2").style.backgroundColor = colors[1];
-	document.querySelector("#r3").style.backgroundColor = colors[2];
-	document.querySelector("#r4").style.backgroundColor = colors[3];
-	
-}
-
-// ***************************************************************************
-
 	function finish_question() {
 
 		canreply = false;
 
-		var showrep = document.querySelector("#setup input#showrep").checked;
+		var values = [0,0,0,0,0];
+		for(var i=0;i<users.length;i++) 
+			if(users[i].rep!=null)
+				values[users[i].rep-1]++;
+			else
+				values[4]++;
 
-		if(showrep) {
+		console.log("VALUES");
+		console.log(values);
 
-			var question = questions[qindex];
-			var answer = question.oldanswer || question.answer;
-
-			for (var i = 1; i <= 4; i++)
-				if (i != answer)
-					document.querySelector("#r" + i + " .mask").style.display = "block";
-
-			setTimeout(show_score, 4000);
-		}
+		
+		if(showrep)	 {
+			document.querySelector("#question img").src = draw_chart(chart,values);
+			setTimeout(show_answer,4000);
+			}
+		else if(users.length==0)
+			setTimeout(next_question,10);
 		else
-			setTimeout(show_score,0);
+			setTimeout(next_question, 4000);
+	}
 
+// ***************************************************************************
+
+	function show_answer() {	
+		
+		var question = questions[qindex];
+		var answer =  question.answer;
+
+		for (var i = 1; i <= 4; i++) 
+			if (i != answer) 
+				document.querySelector("#r" + i).classList.add("wrong");
+		setTimeout(show_score, 4000);
 	}
 
 
 // ***************************************************************************
 
 	function show_score() {
+		
+		for(var i=1;i<=4;i++) 
+		document.querySelector("#r"+i).classList.remove("wrong");
 
-		display_users("score","score");
+		display_scores("score","score");
 		show_page("score");
 
 		document.querySelector("#r1").classList.add("zero");
 		document.querySelector("#r2").classList.add("zero");
 		document.querySelector("#r3").classList.add("zero");
 		document.querySelector("#r4").classList.add("zero");
-	
+
+		seq++;	
 		for (var i = 0; i < users.length; i++) {
 			var user = users[i];
 			if(!user.rep)
@@ -903,8 +650,9 @@ function shuffle_colors(question) {
 			var msg = {
 				type: "status",
 				pid: user.pid,
+				seq,
 				line1: format_reply(user.rep),
-				line2: i18n(I_USCORE, user.score + " / " + questions.length),
+				line2: i18n(I_USCORE, user.score + " / " + (qindex+1)),
 				line3: (qindex + 1 >= questions.length) ? "" : i18n(I_WAIT, qindex + 2)
 			};
 			send(msg);
@@ -931,8 +679,11 @@ function shuffle_colors(question) {
 // ***************************************************************************
 
 	function next_question() {
-		if (qindex + 1 >= questions.length)  
-			setTimeout(show_games,10000);
+		if (qindex + 1 >= questions.length)   {
+			console.log("NO MORE QUESTION - CLOSE DESKTOP CONNECTION");
+			cn.close();
+			return;
+			}
 		else
 			show_question(qindex + 1);
 	}
@@ -951,7 +702,7 @@ function shuffle_colors(question) {
 			for (var i = 0; i < pages.length; i++)
 				pages[i].style.display = "none";
 			var page = document.querySelector(".page#" + name);
-			if (page) page.style.display = "block";
+			if (page) page.style.display = "flex";
 		}
 
 		function f2() {
@@ -984,7 +735,7 @@ function shuffle_colors(question) {
 		}
 
 		var size = 80;
-		var ctx = canvas.getContext("2d");
+		var ctx = chrono.getContext("2d");
 		var x = size / 2;
 		var y = size / 2;
 		var r = size / 2;
@@ -1014,8 +765,6 @@ function shuffle_colors(question) {
 
 	function display_users(page,key) {
 
-	// sort users by decreasing key value
-		users.sort( function(ua,ub) { return ub[key]-ua[key] });
 
 		var w = (window.innerWidth*48/100)|0;
 		var h = (window.innerHeight*10/100)|0;
@@ -1023,169 +772,56 @@ function shuffle_colors(question) {
 		var table = document.querySelector("#" + page + " .users");
 		var s = ""
 		for (var i = 0; i < users.length; i++) {
-			if(questions)
-				var post = users[i].score == questions.length ? "🏆":"";
-			else
-				var post = "";
 
-			if(!questions)
-				var total = "&nbsp;";
-			else
-				var total = (qindex==questions.length-1) ? users[i].score : "";
+			var name = users[i].name;
+			if(name.length>30) name = name.substring(0,30);
+
+			s += "<span>";
+			s += name + "<br>"
+			s += "</span>"
+		}
+
+		table.innerHTML = s;
+
+	}
+
+// ***************************************************************************
+
+
+	function display_scores(page,key) {
+
+	var hdr = document.querySelector("#score .header span");
+	if(qindex+1==questions.length) 
+		hdr.innerText = "SCORE  FINAL";
+
+	// sort users by decreasing key value
+		users.sort( function(ua,ub) { return ub[key]-ua[key] });
+
+		var w = (window.innerWidth*48/100)|0;
+		var h = (window.innerHeight*10/100)|0;
+
+		var table = document.querySelector("#score .content .center table ");
+		var s = ""
+		for (var i = 0; i < users.length; i++) {
+			var user = users[i].name;
+			if(user.length>30) user = user.substring(0,30);
+
+			var post = users[i].score == questions.length ? "🏆":"";
+
+			var total =  users[i].score;
 
 			s += "<tr>";
-			s += "<td width='50%'><canvas width='"+w+"' height='"+h+"'/></td>";
-			s += "<td width='45%'><div class='name'>" + users[i].name + " &nbsp; "+post+"</div></td>";
-			s += "<td width='10%' class='total'>"+total+"</td>";
+			s += "<td width='55%'>" + user + " &nbsp; "+post+"&nbsp;</td>";
+			s += "<td width='10%'>"+total+"</td>";
 			s += "</tr>"
 		}
 		table.innerHTML = s;
 
-		if(!questions) return;
 
-
-		var dx = w / questions.length;
-
-		var c = document.querySelectorAll("#" + page + " .users canvas");
-		for (var i = 0; i < users.length; i++) {
-
-			var canvas = c[i];
-			canvas.width = w;
-			canvas.height = h;
-			var ctx = c[i].getContext("2d");
-
-			ctx.fillStyle = "white";
-			ctx.fillRect(0, 0, w, h);
-
-			ctx.strokeStyle = "#DDD";
-			for (var j=0 ; j<questions.length;j++) {
-				var x = dx * j;
-				ctx.strokeRect(dx * j, 0, dx - 5, h);
-			}
-
-			ctx.fillStyle = "#DDD";
-			for (var j = 0; j < qindex+1 ; j++) {
-				var x = dx * j;
-				ctx.fillRect(dx * j, 0, dx - 5, h);
-			}
-
-			ctx.fillStyle = "#0C0";
-			for (var j = 0; j < qindex+1; j++) {
-				var x = dx * j;
-				if(users[i].detail[j]=="1")
-					ctx.fillRect(dx * j, 0, dx - 5, h);
-			}
-		}
-
-		if (qindex == questions.length - 1)
-			document.querySelector("#score .header span").innerText =
-				i18n(I_FSCORE);
-		else
-			document.querySelector("#score .header span").innerText =
-				i18n(I_SCORE);
 	}
 
 // ***************************************************************************
 
-function ondrag(event) {
-
-	event.preventDefault();
-
-}
-
-// ***************************************************************************
-
-function ondrop(event) {
-
-	event.preventDefault();
-
-	var entries = null;
-	var eindex = -1;		// index of json file 
-
-	if(event.dataTransfer.items)
-		var file = event.dataTransfer.items[0].getAsFile();
-	else
-		var file = event.dataTransfer.files[0];
-
-	try {
-		zip.createReader(new zip.BlobReader(file), f1);
-	}
-	catch(err) {
-		alert(err);
-	}
-
-	function f1(reader) {		
-		reader.getEntries(f2);
-	}
-
-	function f2(ee) {
-		entries = ee;
-		for(var i=0;i<entries.length;i++)  {
-			console.log("ENTRY "+i+" >>>"+entries[i].filename+"<<<");
-			if(entries[i].filename.match(/\/games.json$/)) 
-				f3(i);
-		}
-	}
-
-	function f3(index) {
-		eindex = index;
-		entries[eindex].getData(new zip.TextWriter(), f4);	
-	}
-
-	function f4(text) {
-		try {
-			games = JSON.parse(text);
-			show_games();		
-			preload = zip_preloader;
-		}
-		catch(err) {
-			alert(err);
-		}
-	}
-
-	function zip_preloader() {
-
-		console.log("ZIP PRELOADER");
-
-		images = [];
-
-		var URL = window.URL || window.webkit.URL;
-
-		var game = games[gindex];
-				
-		var prefix = entries[eindex].filename.replace(/games.json$/,"");
-
-		console.log("PREFIX "+prefix);
-
-		var qindex = -1;
-
-		preload_one();
-
-		function preload_one() {
-
-			qindex++;
-			if(qindex>=questions.length) return show_question(0);
-
-			var target = prefix+game.name+"/"+questions[qindex].img;
-			for(var j=0;j<entries.length;j++)  {
-				if(entries[j].filename==target) {
-					entries[j].getData(new zip.BlobWriter(),function(blob) {
-						var image = new Image();
-						image.onload = preload_one;
-						image.onerror = preload_one;
-						image.src = URL.createObjectURL(blob);	
-						images.push(image);
-					});
-					break;
-				}
-			}
-		}
-	}
-
-
-}
-
-// ***************************************************************************
 
 function send(msg){
 	cn.send(JSON.stringify(msg));
@@ -1195,8 +831,7 @@ function send(msg){
 
 function show_qrcode() {
 
-	var qdiv = document.querySelector("#qrcode");
-	qdiv.style.display = "block";
+	var qdiv = document.querySelector(".qrcode");
 
 	var rect = qdiv.getBoundingClientRect();
 
@@ -1207,17 +842,19 @@ function show_qrcode() {
 	else if(width>height)
 		width=height;
 
-	width -= 40;
-	height -= 40;
+	width -= 50;
+	height -= 50;
 
-	var area = document.querySelector("#area");
+	var area = document.querySelector(".qrcode .area");
 	area.innerHTML = "";
 
 	area.style.top = ((rect.height/2 - height/2)|0)+"px";
 	area.style.left = ((rect.width/2 - width/2)|0)+"px";
+	area.style.width = width+"px";
+	area.style.height = height+"px";
 
 	var qrcode = new QRCode(area, {
-		text:location.href + gid,
+		text:"https://lerallyemobile.fr:8000",
 		width:width,
 		height:height,
 		colorDark: "#000000",
@@ -1228,62 +865,188 @@ function show_qrcode() {
 
 // ***************************************************************************
 
-function hide_qrcode() {
+function load_game(gname) {
 
-	document.querySelector("#qrcode").style.display = "none";
+	var iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	iframe.addEventListener("load", onload);
+	iframe.addEventListener("error",onerror);
+	iframe.src = gname+".json";
+
+	function onload(e) {
+		var t = iframe.contentWindow.document.body.innerText;
+		try {
+			parse_game(t);
+			}
+		catch(err) {
+			alert("Erreur dans le format du jeu");
+			console.log(err);
+			}
+	}
+
+	function onerror(err) {
+		alert("Erreur au chargement du jeu");
+		console.log(err);
+	}
+}
+
+function parse_game(t) {
+
+	game = JSON.parse(t);
+
+	questions = game.questions;
+
+	var nimg = 0;
+	var nerr = 0;
+        
+	for (var i = 0; i < questions.length; i++) {
+			var image = new Image();
+			image.addEventListener("load", onload);
+			image.addEventListener("error", onerror);
+			image.src = game.name+"/"+questions[i].img;
+			images.push(image);
+	}
+
+	function onload() {
+			nimg ++;
+	}
+
+	function onerror() {
+		if(nerr>0) return;
+		nerr++;
+		alert("Erreur au chargement des images");
+	}
 }
 
 // ***************************************************************************
 
-function onsetup() {
+function start_game() {
 
-	document.querySelector("#setup .header span").innerText = i18n(I_SETUP);
-	document.querySelector("#setup label[for='showrep']").innerText = i18n(I_SHOW);
-	document.querySelector("#setup label[for='rcolor']").innerText = i18n(I_COLOR);
+	show_page("pageq");
 
-	show_delay();
-
-	show_page("setup");
+	show_question(0);
 
 }
 
 // ***************************************************************************
 
-function onminus() {
+function get_delay() {
 
-	if(delay>5)
-		delay -= 5;
+	var s = get_param("delay");
+	if(!s) return null;
 
-	show_delay();
+	return parseInt(s);
 }
 
 // ***************************************************************************
 
-function onplus() {
+function get_param(name) {
 
-	delay += 5;
+	var s = location.search.substring(1).split("&");
+	for(var i=0;i<s.length;i++) {
+		var p = s[i].split("=");
+		if(p.length==2)
+			if(p[0]==name)
+				return p[1];
+	}
 
-	show_delay();
+	return null;
 }
+
 
 // ***************************************************************************
 
-function show_delay() {
+function draw_chart(chart,values) {
 
-	document.querySelector(".setup .delay").innerText = i18n(I_DELAY,delay);
+	const COLORS = ["#FF8","#88F","#8F8","#F88","#DDD"];
+
+	var ctx = chart.getContext("2d");
+	
+	var w = chart.width;
+	var h = chart.height;
+
+	var xc = w/2;
+	var yc = h/2;
+
+	ctx.fillStyle = "black";
+	ctx.fillRect(0,0,w,h);
+	
+	var r = w*2/6;
+	if(h*2/3<r) r = h*2/3;
+
+	r = r||0;	
+
+	/*
+	var slices = [];
+	for(var i=0;i<values[0];i++) slices.push(COLORS[0]);
+	for(var i=0;i<values[1];i++) slices.push(COLORS[1]);
+	for(var i=0;i<values[2];i++) slices.push(COLORS[2]);
+	for(var i=0;i<values[3];i++) slices.push(COLORS[3]);
+	for(var i=0;i<values[4];i++) slices.push(COLORS[4]);
+	*/
+
+	var sum = values[0]+values[1]+values[2]+values[3]+values[4];
+
+	var start = -Math.PI/2;
+	var end = 0;
+		
+	for(var i=0;i<5;i++) {
+		end = start - 2*Math.PI*values[i]/sum;
+		draw_slice(start,end,COLORS[i]);
+		start = end;
+	}
+
+	start = -Math.PI/2;
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "black";
+
+	for(var i=0;i<sum;i++) {
+		ctx.beginPath();
+		ctx.moveTo(xc,yc);
+		ctx.lineTo(xc+r*Math.cos(start),yc+r*Math.sin(start));
+		ctx.stroke();
+		start += 2*Math.PI/sum;
+	}
+
+	ctx.fillStyle = "black";
+	ctx.beginPath();
+	ctx.arc(xc,yc,r/2,0,2*Math.PI,1);
+	ctx.fill();
+
+	return chart.toDataURL();
+
+	function draw_slice(start,end,color) {
+		ctx.fillStyle = color;
+		ctx.strokeStyle = "black";
+		ctx.beginPath();
+		ctx.moveTo(xc,yc);
+		ctx.lineTo(xc+r*Math.cos(start),yc+r*Math.sin(start));
+		ctx.arc(xc,yc,r,start,end,1);
+		ctx.closePath();
+		ctx.fill();
+	}
 
 }
 
+
 // ***************************************************************************
 
-function onsetupok() {
+function ondblclick(event) {
 
-	show_page("games");
+    var target = event.target;
+
+    try {
+        if (screenfull.isEnabled) { screenfull.toggle(); }
+    } catch(err) {
+        
+    }
 
 }
 
+
 // ***************************************************************************
+
 
 </script>
-
 </html>
