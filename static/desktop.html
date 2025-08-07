@@ -1,4 +1,4 @@
-e!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -294,7 +294,7 @@ iframe	{
 
 	<div class="page" id="welcome">
 		<div class="header">
-			<span>https://lerallyemobile.fr:8000</span>
+			<span></span>
 		</div>
 		<div class="content">
 			<div class="left">
@@ -352,6 +352,7 @@ iframe	{
 <script src="qrcode.js"></script>
 <script src="i18n.js"></script>
 <script>
+	var started = false;
 	var seq = 0;
 
 	var COLORS = ["#FF8","#88F","#8F8","#F88"];
@@ -365,6 +366,9 @@ iframe	{
 	var delay = get_delay() || 25;
 	var gname = get_param("game") || "test";
 	var ratio = get_param("ratio") || "1";
+
+	var url = location.protocol+"//"+location.host;
+	document.querySelector("#welcome .header span").innerText = url;
 
 	var chrono = document.querySelector("#chrono canvas");
 
@@ -423,6 +427,11 @@ iframe	{
 
 			case "user":
 				// no new player when game is started
+				if(started) {
+					console.log("SENDING STARTED TO ",msg.pid);
+					send({type:"error",pid:msg.pid,value:"started"});
+					return;	
+				}
 				//if(qindex>=0) break;
 
 				// look whether user already registered
@@ -853,8 +862,10 @@ function show_qrcode() {
 	area.style.width = width+"px";
 	area.style.height = height+"px";
 
+	var url = location.protocol+"//"+location.host;
+
 	var qrcode = new QRCode(area, {
-		text:"https://lerallyemobile.fr:8000",
+		text:url,
 		width:width,
 		height:height,
 		colorDark: "#000000",
@@ -922,6 +933,9 @@ function parse_game(t) {
 // ***************************************************************************
 
 function start_game() {
+
+
+	started = true;
 
 	show_page("pageq");
 
