@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>QUIZZ</title>
+<style>
+@font-face {
+	font-family: myfont;
+	font-style: normal;
+	font-weight: 400;
+	src: url(josefinslab.ttf);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+transition: opacity 0.1s;
+}
+
+iframe	{
+	display:none;
+}
+
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Old versions of Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; /* Non-prefixed version */
+}
+
+.page {
+	display:none;
+	position:fixed;
+	left:0px;
+	top:0px;
+	width:100%;
+	height:100%;
+	flex-direction:column;
+	justify-content:space-between;
+}
+
+.page .content {
+	overflow-y:scroll;
+}
+
+.header {
+	left: 0px;
+	width: 100%;
+	height: 12vh;
+	border-collapse: collapse;
+	background-color: #AAA;
+	color: white;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
+
+.header span {
+	text-align: center;
+	font-family: myfont;
+	font-size: 6vw;
+	letter-spacing: 2px;
+}
+
+#welcome .content {			
+	display:flex;
+	flex-direction:row;
+	flex:auto;
+}
+
+#welcome .content .left {
+	width:50%;
+	overflow:hidden;
+}
+
+#welcome .content .right {
+	width:50%;
+}
+
+.footer {
+	width: 100%;
+	height: 12vh;
+	background-color: #AAA;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
+
+.footer button {
+	font-size: 5vh;
+	font-family: myfont;
+	border-radius: 10px;
+	padding-left: 15vw;
+	padding-right: 15vw;
+	background-color: inherit;
+	color: white;
+	border:2px solid white;
+	cursor:pointer;
+	padding-top:2vh;
+	padding-bottom:1vh;
+}
+
+.footer button:hover {
+	background-color:white;
+	color:#AAA;
+}
+
+.footer label {
+	font-size:6vh;
+	font-family:myfont;
+	color:white;
+	cursor:pointer;
+}
+
+#question {
+	background-color: black;
+	color:white;
+	height:80vh;
+	width:100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-family: myfont;
+	font-size: 6vh;
+	line-height:12vh;
+}
+
+#question img {
+	transition: height 0.5s;
+	height:100%;
+}
+
+#choices {
+	height: 20vh;
+	width: 100%;
+	display:flex;
+	flex-direction:row;
+}
+
+#choices .half  {
+	display:flex;
+	flex-direction:column;
+	width:50%;
+	height:20vh;
+}
+
+#choices .half div  {
+	height: 10vh;
+	text-align: center;
+	font-family: myfont;
+	font-size: 36px;
+	color: #333;
+	overflow:hidden;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	cursor:pointer;
+}
+
+#choices .half div.wrong {
+	background-color:white;
+}
+
+#choices .half div span {
+	font-size:4vw;
+	font-weight:bold;
+	transition: font-size 0.5s;
+	overflow:hidden;	
+	cursor:pointer;
+}
+
+#choices .half div.wrong span {
+	color:white;
+}
+
+#choices .half div.zero span {
+	font-size:1px;
+}
+
+#r1 {
+	background-color: #FF8;
+}
+
+#r2 {
+	background-color: #88F;
+}
+
+#r3 {
+	background-color: #8F8;
+}
+
+#r4 {
+	background-color: #F88;
+}
+
+#chrono {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	width: 80px;
+	height: 80px;
+	z-index: 10;
+}
+
+#number {
+	position:fixed;
+	top:10px;
+	left:0px;	
+	width:80px;
+	z-index:10;
+	font-size: 5vw;
+	font-family: myfont;
+	font-weight:bold;
+	text-align:center;
+	color:white;
+	background-color:black;
+}
+
+
+#palmares {
+	display:flex;
+	flex-direction:column;
+	justify-content:start;
+}
+
+#palmares .content div {	
+	display:flex;
+	flex-direction:row;
+	font-family: myfont;
+	font-size:4vw;
+	line-height:5vw;
+}
+
+#palmares .content div .margin {
+	width:15vw;
+	text-align:center;
+}
+
+#palmares .content div .left {
+	width:50vw;
+	text-align:center;
+	text-overflow:clip;
+	overflow:hidden;
+	white-space:nowrap;
+}
+
+#palmares .content div .right {
+	width:20vw;
+	text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+
+	<div class="page" id="pageq">
+		<div id="chrono">
+			<canvas width="80" height"80" />
+		</div>
+		<div id="number">
+		</div>
+		<div id="question">
+		</div>
+		<div id="choices">
+			<div class="half">
+			<div id="r1" class="zero"><span></span></div>
+			<div id="r2" class="zero"><span></span></div>
+			</div>
+			<div class="half">
+			<div id="r3" class="zero"><span></span></div>
+			<div id="r4" class="zero"><span></span></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="page" id="palmares">	
+		<div class="header">
+			<span>PALMARES</span>
+		</div>
+		<div class="content">
+		</div>
+	</div>
+
+</body>
+<script>
+
+	var COLORS = ["#FF8","#88F","#8F8","#F88"];
+
+	// chart canvas
+	var chart = document.createElement("canvas");
+	var w = chart.width = 600;
+	var h = chart.height = 600;
+
+	// each question proposed during 30 seconds
+	var delay = 30;
+	var game = get_param("game") || "test";
+
+	if(get_param("reset"))
+		reset_game();
+
+	var chrono = document.querySelector("#chrono canvas");
+
+	var canreply = false;
+	var hasreplied = false;
+	var helped = false;
+	var imaged = false;
+
+	var images = [];		// preloaded images
+	var questions = null;
+	var qindex = -1;
+
+	var tobesaved   = false;
+
+	var current_page = "";
+
+	var user = localStorage.getItem(game+"/user");
+	if(!user) {
+		user = window.prompt("Votre nom d'équipe ?")
+		if(!user) window.close();
+		localStorage.setItem(game+"/user",user);
+	}
+
+	document.querySelector("#r1").addEventListener("click",onreply);
+	document.querySelector("#r2").addEventListener("click",onreply);
+	document.querySelector("#r3").addEventListener("click",onreply);
+	document.querySelector("#r4").addEventListener("click",onreply);
+
+	show_page("pageq");
+
+	setTimeout(start_game,10);
+
+
+
+// ***************************************************************************
+
+	function run() {
+		qindex++;
+		console.log("RUN ",qindex);
+		if(qindex>=questions.length) return finish_game();
+		
+		var done = localStorage.getItem(game+"/reply"+(qindex+1));
+		if(done) return setTimeout(run,10);
+
+		show_question()	;
+	}
+	
+// ***************************************************************************
+
+
+	function show_question() {
+
+		if(!helped) {
+			document.querySelector("#question").innerText =
+				`Vous avez 30 secondes
+				pour répondre à chaque question
+				en cliquant sur un des boutons
+				ci-dessous`;
+		helped = true;
+		setTimeout(show_question,5000);
+		return;
+		}
+
+		if(!imaged) {
+			document.querySelector("#question").innerHTML =
+				"<img id='image'></img>";
+			imaged = true;
+		}
+
+		hasreplied = false;
+
+		var question = questions[qindex];
+
+		document.querySelector("#number").innerText = ""+(qindex+1);
+
+
+		setTimeout(fa,  400);
+		setTimeout(fb,  800);
+		setTimeout(fc, 1200);
+		setTimeout(f0, 1600);
+		setTimeout(f1, 2000);
+		setTimeout(f2, 6000);
+		setTimeout(f3, 6500);
+		setTimeout(f4, 7000);
+		setTimeout(f5, 7500);
+		setTimeout(f6, 8000);
+
+		function fa() {
+			document.querySelector("#r1").classList.add("zero");
+			document.querySelector("#r2").classList.add("zero");
+			document.querySelector("#r3").classList.add("zero");
+			document.querySelector("#r4").classList.add("zero");
+		}
+	
+		function fb() {
+			document.querySelector("#r1").classList.remove("wrong");
+			document.querySelector("#r2").classList.remove("wrong");
+			document.querySelector("#r3").classList.remove("wrong");
+			document.querySelector("#r4").classList.remove("wrong");
+			document.querySelector("#question img").height = 0;
+		}
+
+		function fc() {
+			document.querySelector("#question img").src = images[qindex].src;
+			document.querySelector("#r1 span").innerText = question.choices[0];
+			document.querySelector("#r2 span").innerText = question.choices[1];
+			document.querySelector("#r3 span").innerText = question.choices[2];
+			document.querySelector("#r4 span").innerText = question.choices[3];
+		}
+
+
+		function f0() {
+			show_page("pageq");
+		}
+
+		function f1() {
+			var el1 = document.querySelector("#question");
+			var el2 = document.querySelector("#choices");
+			var h = el2.offsetTop - el1.offsetTop;
+			document.querySelector("#question img").height = h;
+			}
+
+		function f2() {
+			document.querySelector("#r1").classList.remove("zero");
+		}
+
+		function f3() {
+			document.querySelector("#r3").classList.remove("zero");
+		}
+
+		function f4() {
+			document.querySelector("#r2").classList.remove("zero");
+		}
+
+		function f5() {
+			document.querySelector("#r4").classList.remove("zero");
+		}
+
+		function f6() {
+			canreply = true;
+			start_chrono();
+		}
+	}
+
+
+// ***************************************************************************
+
+
+	function onreply(event) {
+
+		if(!canreply) return;
+
+		canreply = false;
+
+		var target = event.target;
+		if(target.tagName=="SPAN")
+			target = target.parentElement;
+
+		var id = target.id;
+		if(id!="r1") document.querySelector("#r1").classList.add("wrong");
+		if(id!="r2") document.querySelector("#r2").classList.add("wrong");
+		if(id!="r3") document.querySelector("#r3").classList.add("wrong");
+		if(id!="r4") document.querySelector("#r4").classList.add("wrong");
+	
+		var reply = id.replace(/r/,"")*1;
+		localStorage.setItem(game+"/reply"+(qindex+1),reply);
+
+		hasreplied = true;
+		tobesaved = true;
+
+		console.log("CALLING RUN IN 1000 S");
+		setTimeout(run,1000);
+	}
+
+// ***************************************************************************
+
+	function finish_question() {
+
+		tobesaved = true;
+
+		localStorage.setItem(game+"/reply"+(qindex+1),0);
+		run();	
+	}
+
+// ***************************************************************************
+
+
+	function show_page(name) {
+
+
+		if(current_page==name) return;
+		current_page = name;
+
+		document.body.style.opacity = 0;
+		
+		setTimeout(f1,100);
+		setTimeout(f2,200);
+
+		function  f1() {
+			var pages = document.querySelectorAll(".page");
+			for (var i = 0; i < pages.length; i++)
+				pages[i].style.display = "none";
+			var page = document.querySelector(".page#" + name);
+			if (page) page.style.display = "flex";
+		}
+
+		function f2() {
+			document.body.style.opacity = 1;
+		}	
+		
+	}
+
+
+// ***************************************************************************
+
+	function start_chrono() {	
+		t1 = new Date().getTime();
+		document.querySelector("#chrono").style.display = "block";
+		setTimeout(draw_chrono, 0);
+	}
+
+
+// ***************************************************************************
+
+	function draw_chrono() {
+	
+		if(hasreplied) return;
+	
+		var t2 = new Date().getTime();
+		var pct = (t2 - t1) / (1000 * delay);
+
+		if (pct > 1) {
+			document.querySelector("#chrono").style.display = "none";
+			finish_question();
+			return;
+		}
+
+		var size = 80;
+		var ctx = chrono.getContext("2d");
+		var x = size / 2;
+		var y = size / 2;
+		var r = size / 2;
+		var a = Math.PI * 2 * pct;
+		ctx.clearRect(0, 0, size, size);
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		ctx.arc(x, y, r, a - Math.PI / 2, Math.PI * 2 - Math.PI / 2, false);
+		ctx.closePath();
+		ctx.fillStyle = "#888";
+		ctx.fill();
+
+		setTimeout(draw_chrono, 100);
+	}
+
+
+// ***************************************************************************
+
+function start_game() {
+
+
+	var iframe = document.createElement("iframe");
+	document.body.appendChild(iframe);
+
+	iframe.addEventListener("load", onload);
+	iframe.addEventListener("error",onerror);
+	iframe.src = game+".json";
+
+	function onload(e) {
+		var t = iframe.contentWindow.document.body.innerText;
+		try {
+			parse_game(t);
+			}
+		catch(err) {
+			alert("Erreur dans le format du jeu");
+			console.log(err);
+			}
+	}
+
+	function onerror(err) {
+		alert("Errer au chargement du jeu");
+		console.log(err);
+	}
+}
+
+function parse_game(t) {
+
+	data = JSON.parse(t);
+
+	questions = data.questions;
+
+	var nimg = 0;
+	var nerr = 0;
+        
+	for (var i = 0; i < questions.length; i++) {
+			var image = new Image();
+			image.addEventListener("load", onload);
+			image.addEventListener("error", onerror);
+			image.src = data.name+"/"+questions[i].img;
+			images.push(image);
+	}
+
+	function onload() {
+			nimg ++;
+			if(nimg==questions.length) return setTimeout(run,10);
+	}
+
+	function onerror() {
+		if(nerr>0) return;
+		nerr++;
+		alert("Erreur au chargement des images");
+	}
+}
+
+// ***************************************************************************
+
+function get_delay() {
+
+	var s = get_param("delay");
+	if(!s) return null;
+
+	return parseInt(s);
+}
+
+// ***************************************************************************
+
+function get_param(name) {
+
+	var s = location.search.substring(1).split("&");
+	for(var i=0;i<s.length;i++) {
+		var p = s[i].split("=");
+		if(p.length==2)
+			if(p[0]==name)
+				return p[1];
+	}
+
+	return null;
+}
+
+
+// ***************************************************************************
+
+function reset_game() {
+
+	for(var i=0;i<100;i++)
+		localStorage.removeItem(game+"/reply"+(i+1));
+
+	localStorage.removeItem(game+"/user");
+}
+
+// ***************************************************************************
+
+function finish_game() {
+
+	show_page("palmares");
+
+	var reply = "";
+	for(var i=0;i<questions.length;i++)
+		reply+= localStorage.getItem(game+"/reply"+(i+1));
+
+	var url = "savegame/"+user+"/"+game+"/"+reply;
+	console.log("URL",url);
+
+
+	if(!tobesaved)
+		return get_palmares(questions.length);
+
+    var iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+
+    iframe.addEventListener("load", onload);
+    iframe.addEventListener("error",onerror);
+    iframe.src = url;
+
+	function onload() {
+		var t = iframe.contentWindow.document.body.innerText;
+		console.log(t);
+		get_palmares(questions.length);
+	}
+
+	function onerror() {
+		alert("ERROR SAVING GAME");
+	}	
+}
+
+// ***************************************************************************
+
+function get_palmares(nq) {
+
+	var url = "/palmares/"+game;
+
+    var iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+
+    iframe.addEventListener("load", onload);
+    iframe.addEventListener("error",onerror);
+    iframe.src = url;
+
+	function onload() {
+		var t = iframe.contentWindow.document.body.innerText;
+		t = JSON.parse(t);
+		console.log(t);
+		display_palmares(t,nq);
+	}
+
+	function onerror(err) {
+		alert("Erreur à la récupération du palmares");
+	}
+}
+
+// ***************************************************************************
+
+function display_palmares(data,nq) {
+	
+	var list = [];
+	for(var user in data) {
+		var score = data[user].split("-")[0]*1;
+		var time = data[user].split("-")[2]*1;
+		list.push({user,score,time});
+	}
+
+	list.sort( compare);
+
+	var html = [];
+
+	for(var i=0;i<list.length;i++) {
+		var middle = list[i].score==nq ? "🏆" :"";
+
+		html.push(`<div>`);
+		html.push(`<span class='margin'></span>`);
+		html.push(`<span class='left'>${list[i].user}</span>`);
+		html.push(`<span class='right'>${list[i].score}</span>`);
+		html.push(`<span class='margin'>${middle}</span>`);
+		html.push(`<span class='margin'></span>`);
+		html.push(`</div>`);
+	}
+
+	document.querySelector("#palmares .content").innerHTML =
+		html.join("\n");
+
+	function compare(a,b) {
+		if(b.score>a.score) return 1;
+		if(b.score<a.score) return -1;
+		return a.time-b.time;
+	}
+}
+
+// ***************************************************************************
+
+</script>
+</html>
