@@ -36,6 +36,10 @@ app.get("/getstate", function(req,res) {
 	res.send(cndesktop?"Busy":"Free");
 });
 
+app.get("/savegame/:user/:game/:reply", save_game);
+
+app.get("/palmares/:game", load_palmares);
+
 app.get("/:filename", function(req,res) {
 	res.sendFile(req.params.filename,{root:"static"});
 });
@@ -121,8 +125,14 @@ wss.on("connection", function(cn, req) {
 	case "status":
 		forward_mobile(msg);
 		break;
+
+	case "error":
+		forward_mobile(msg);
+		break;
+
             }
         });
+
 
     cn.on("close", close_connection);
     });
@@ -200,6 +210,61 @@ function terminate() {
 	broadcast_mobiles({type:"close"});
 
 	process.exit(0);
+}
+
+//********************************************************
+
+function save_game(req,res) {
+			
+	try {
+	var user = req.params.user;
+	var game = req.params.game;
+	var reply = req.params.reply;
+	var time = new Date().getTime();
+
+	var data = fs.readFileSync("static/"+game+".json","utf8");
+	data = JSON.parse(data);
+
+	if(reply.length!=data.questions.length) {
+		console.log("BAD LENGTH",reply.length,"VS",data.questions.length);
+		return;
+	}	
+
+	var score = 0;
+	for(var i=0;i<reply.length;i++)  {
+		if(reply[i]==data.questions[i].answer)
+			score++;
+		}
+
+	var palmares;
+
+	try {
+		palmares = fs.readFileSync("palmares-"+game+".json","utf8");
+		}
+	catch(err) {
+		console.log(err);
+		palmares = "{}";
+		}
+
+	palmares = JSON.parse(palmares);
+	palmares[user] = score+"-"+reply+"-"+time;
+	palmares = JSON.stringify(palmares);
+
+	fs.writeFileSync("palmares-"+game+".json",palmares,"utf8");
+	
+	res.end("OK");
+			
+	} catch(err) {
+		console.log(err);
+	}	
+}
+
+//********************************************************
+
+function load_palmares(req,res) {
+	var game = req.params.game;
+
+	res.sendFile("palmares-"+game+".json",{root:"."});
 }
 
 //********************************************************
